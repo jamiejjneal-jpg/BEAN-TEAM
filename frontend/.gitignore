@@ -1,0 +1,25 @@
+# Next.js build + cache (never push to git — includes huge Turbopack SSTs)
+.next/
+**/.next/
+dev/
+cache/
+.turbo/
+.turbopack/
+*.sst
+
+# Node
+node_modules/
+.yarn/
+yarn-error.log
+yarn-debug.log
+
+# Environment
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+
+# OS
+.DS_Store
+Thumbs.db

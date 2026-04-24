@@ -1,0 +1,130 @@
+{
+  "theme": "LIGHT",
+  "archetype": "Archetype 1 (Organic & Earthy)",
+  "emotional_tone": "Trustworthy, Warm, Professional, Energetic but Organized",
+  "design_context": "SaaS Platform & Landing Page (Business Management System)",
+  "typography": {
+    "fonts": {
+      "headings": {
+        "family": "Outfit",
+        "weight": "font-light to font-black",
+        "usage": "H1, H2, H3, large display numbers, hero section"
+      },
+      "body": {
+        "family": "Manrope",
+        "weight": "font-normal to font-medium",
+        "usage": "Paragraphs, lists, data tables, secondary text"
+      },
+      "mono": {
+        "family": "IBM Plex Mono",
+        "weight": "font-normal",
+        "usage": "Metrics, ID numbers, timestamps, system statuses"
+      }
+    },
+    "scale": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight",
+      "h3": "text-xl sm:text-2xl tracking-tight",
+      "h4": "text-lg sm:text-xl",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm",
+      "overline": "text-xs tracking-[0.2em] uppercase font-bold"
+    }
+  },
+  "colors": {
+    "background": {
+      "default": "#F9F8F6",
+      "paper": "#FFFFFF",
+      "subtle": "#F2F0EB"
+    },
+    "primary": {
+      "default": "#1A4331",
+      "hover": "#265C45",
+      "light": "#E8F0EC"
+    },
+    "accent": {
+      "terracotta": "#E06D53",
+      "terracotta_hover": "#C95A41",
+      "ochre": "#DDA74F",
+      "sage": "#8EA396"
+    },
+    "text": {
+      "primary": "#1A1A1A",
+      "secondary": "#5C5C5C",
+      "tertiary": "#8A8A8A",
+      "on_primary": "#FFFFFF"
+    },
+    "border": {
+      "default": "#E5E3DB",
+      "strong": "#D1CFC7"
+    },
+    "status": {
+      "success": "#2D7A5D",
+      "warning": "#DDA74F",
+      "error": "#E06D53",
+      "info": "#4A7A8C"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous Spacing Philosophy - use 2x more padding than typical SaaS to create a calming, unpretentious experience.",
+    "page_container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "dashboard_grid": "Control Room Grid (Dense, functional): grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6",
+    "landing_grid": "Bento Grid (Asymmetrical): grid-cols-1 md:grid-cols-8 lg:grid-cols-12 gap-8 lg:gap-12",
+    "padding_scale": {
+      "card_internal": "p-6 sm:p-8",
+      "section_vertical": "py-20 lg:py-32"
+    },
+    "border_radius": "rounded-xl (8px to 12px max for a soft, tactile feel, avoiding hyper-rounded pill shapes)"
+  },
+  "surface_styles": {
+    "cards": "bg-[#FFFFFF] border border-[#E5E3DB] rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200",
+    "interactive_widget": "bg-[#F9F8F6] border border-[#E5E3DB] rounded-xl hover:-translate-y-1 hover:border-[#1A4331]/30 transition-all duration-300",
+    "header_nav": "bg-[#F9F8F6]/80 backdrop-blur-xl border-b border-[#E5E3DB] sticky top-0 z-50",
+    "hero_overlay": "bg-gradient-to-r from-[#1A4331]/80 via-[#1A4331]/40 to-transparent (Never flat black for this earthy theme)"
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#1A4331] text-white hover:bg-[#265C45] rounded-lg px-6 py-2.5 font-medium transition-colors",
+      "secondary": "bg-white text-[#1A4331] border border-[#1A4331] hover:bg-[#E8F0EC] rounded-lg px-6 py-2.5 font-medium transition-colors",
+      "accent": "bg-[#E06D53] text-white hover:bg-[#C95A41] rounded-lg px-6 py-2.5 font-medium transition-colors"
+    },
+    "inputs": "bg-white border border-[#E5E3DB] rounded-lg px-4 py-2.5 focus:border-[#1A4331] focus:ring-1 focus:ring-[#1A4331] outline-none transition-all",
+    "badges": "px-2.5 py-0.5 rounded-full text-xs font-medium tracking-wide",
+    "icons": "lucide-react (using crisp, clear stroke widths, typically size 20 or 24)",
+    "forms": "Use Shadcn components highly customized to remove the 'Vercel-look'. Use the earthy border colors and generous internal padding."
+  },
+  "motion_and_interactions": {
+    "hover_states": "All interactive elements must have a subtle hover state (background color shift, slight translation for cards, or border color change).",
+    "transitions": "Use transition-all duration-200 ease-out for standard interactions. duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] for page sections or modals.",
+    "page_load": "Staggered fade-in for dashboard widgets (using framer-motion if possible, or css animations)."
+  },
+  "images": {
+    "hero_landing": {
+      "url": "https://images.unsplash.com/photo-1755302732892-b371c65e1be5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwyfHxwZW9wbGUlMjB3YWxraW5nJTIwbXVsdGlwbGUlMjBkb2dzfGVufDB8fHx8MTc3NjM3MjAzN3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Person walking a pack of dogs in a park",
+      "usage": "Landing page hero section background or prominent side image."
+    },
+    "client_dashboard_banner": {
+      "url": "https://images.unsplash.com/photo-1674224624366-b8c6cf5ac3d2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwyfHxoYXBweSUyMGRvZyUyMHBvcnRyYWl0fGVufDB8fHx8MTc3NjM3MjAwN3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Happy golden retriever sitting in a field",
+      "usage": "Client dashboard empty state for 'No dogs registered' or top welcome banner."
+    },
+    "walker_abstract_bg": {
+      "url": "https://images.unsplash.com/photo-1773982281923-71fe1c8eacb5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAxODF8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGVhcnRoeSUyMGdyZWVuJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3NzYzNzIwMzZ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract earthy green background",
+      "usage": "Walker profile background cover or login/register split screen background."
+    }
+  },
+  "instructions_to_main_agent": [
+    "Strictly adhere to the 'Organic & Earthy' archetype. Do not use generic SaaS blues or pure dark mode grays.",
+    "Ensure all text meets APCA/WCAG contrast ratios against the off-white backgrounds.",
+    "Use Shadcn UI components but override their default styling in tailwind.config.js and globals.css to match these design guidelines.",
+    "Every page must have a visible navigation bar (Header). No transparent headers without a backdrop-blur and semi-solid background.",
+    "For the Landing Page, use the 'Bento Grid' strategy. Break symmetry. Use overlapping elements.",
+    "For the Dashboards (Admin, Walker, Client), use the 'Control Room Grid'. Keep widgets dense but internally well-padded.",
+    "Implement data-testid attributes on all interactive elements using kebab-case role-based naming (e.g., 'book-walk-button').",
+    "Never use placeholder image URLs. Use the exact image URLs provided in this JSON.",
+    "For charts, use Recharts with the defined brand color palette (Primary Green, Terracotta, Ochre, Sage).",
+    "Do not use the Inter font. Import and use Outfit for headings and Manrope for body text via Next.js next/font/google."
+  ]
+}
