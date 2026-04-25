@@ -129,7 +129,7 @@ export default function ClientProfile() {
             <AlertCircle className="h-5 w-5 text-[#E06D53] shrink-0 mt-0.5" />
             <div className="text-sm">
               <p className="font-medium text-[#1A1A1A]">Please complete your profile</p>
-              <p className="text-[#5C5C5C] mt-0.5">Missing: <strong className="text-[#E06D53]">{missingRequired.join(', ')}</strong>. Walkers need these details to safely look after your dog.</p>
+              <p className="text-[#5C5C5C] mt-0.5">Missing: <strong className="text-[#E06D53]">{missingRequired.join(', ')}</strong>. Walkers need these details to safely look after your pet.</p>
             </div>
           </CardContent>
         </Card>
@@ -171,7 +171,7 @@ export default function ClientProfile() {
         <CardContent className="space-y-4">
           <div className="space-y-2"><Label>Full Name{req}</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} data-testid="profile-name" required /></div>
           <div className="space-y-2"><Label>Phone Number{req}</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} data-testid="profile-phone" placeholder="+44 7xxx xxx xxx" required /></div>
-          <div className="space-y-2"><Label>Home Address{req}</Label><Textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} data-testid="profile-address" placeholder="Where the walker will pick up / drop off your dog" required /></div>
+          <div className="space-y-2"><Label>Home Address{req}</Label><Textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} data-testid="profile-address" placeholder="Where the walker will pick up / drop off your pet" required /></div>
         </CardContent>
       </Card>
 

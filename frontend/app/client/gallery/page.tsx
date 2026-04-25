@@ -132,12 +132,12 @@ export default function ClientGallery() {
             <Camera className="h-7 w-7 text-[#DDA74F]" />
             Walk Gallery
           </h1>
-          <p className="text-[#5C5C5C] mt-1">Photos from your dog&apos;s walks</p>
+          <p className="text-[#5C5C5C] mt-1">Photos from your pet&apos;s walks</p>
         </div>
         <p className="text-sm text-[#8A8A8A]">{filteredPhotos.length} photo{filteredPhotos.length !== 1 ? 's' : ''}</p>
       </div>
 
-      {/* Dog filter */}
+      {/* Pet filter */}
       {dogs.length > 1 && (
         <div className="flex gap-2 flex-wrap">
           <button
@@ -147,7 +147,7 @@ export default function ClientGallery() {
             }`}
             data-testid="filter-all"
           >
-            All Dogs
+            All Pets
           </button>
           {dogs.map(dog => (
             <button
@@ -156,7 +156,7 @@ export default function ClientGallery() {
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                 filter === dog.id ? 'bg-[#1A4331] text-white' : 'bg-[#F2F0EB] text-[#5C5C5C] hover:bg-[#E5E3DB]'
               }`}
-              data-testid={`filter-dog-${dog.id}`}
+              data-testid={`filter-pet-${dog.id}`}
             >
               {dog.name}
             </button>

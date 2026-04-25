@@ -109,7 +109,7 @@ export default function AdminAdminsPage() {
           <Shield className="h-5 w-5 text-[#DDA74F] shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-medium text-[#1A1A1A]">Admin accounts have full access</p>
-            <p className="text-[#5C5C5C] mt-0.5">Admins can view all bookings, walkers, clients, and dogs; approve booking requests; and create/delete other admin accounts. Only add people you fully trust.</p>
+            <p className="text-[#5C5C5C] mt-0.5">Admins can view all bookings, walkers, clients, and pets; approve booking requests; and create/delete other admin accounts. Only add people you fully trust.</p>
           </div>
         </CardContent>
       </Card>

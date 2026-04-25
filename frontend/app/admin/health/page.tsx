@@ -56,16 +56,16 @@ async function runChecks(supabase: ReturnType<typeof createClient>): Promise<Res
     checks.push({ name: 'Profile extension columns', status: 'fail', message: e.message })
   }
 
-  // --- Required dogs columns
+  // --- Required pets columns (DB table is still named `dogs` for backwards-compat)
   try {
-    const { error } = await supabase.from('dogs').select('vet_name, vet_phone, microchip_number, vaccination_details, off_lead').limit(1)
+    const { error } = await supabase.from('dogs').select('vet_name, vet_phone, microchip_number, vaccination_details, off_lead, species, details').limit(1)
     checks.push({
-      name: 'Dog extension columns',
+      name: 'Pet extension columns',
       status: error ? 'fail' : 'ok',
-      message: error ? `Missing columns — run dog extension SQL: ${error.message}` : 'Vet, microchip, vaccination, off-lead columns all present',
+      message: error ? `Missing columns — run pet extension SQL: ${error.message}` : 'Vet, microchip, vaccination, off-lead, species, details all present',
     })
   } catch (e: any) {
-    checks.push({ name: 'Dog extension columns', status: 'fail', message: e.message })
+    checks.push({ name: 'Pet extension columns', status: 'fail', message: e.message })
   }
 
   // --- Storage buckets — anon key can't call listBuckets(), so probe each one with a list-objects call

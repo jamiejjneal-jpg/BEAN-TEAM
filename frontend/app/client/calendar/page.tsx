@@ -9,8 +9,8 @@ export default function ClientCalendarPage() {
     <WeeklyCalendar
       variant="client"
       userId={user.id}
-      title="Your Dog's Week"
-      subtitle="Your upcoming walks and visits Mon → Sun. Print to stick on the fridge — handy for dog-sitters too."
+      title="Your Pets&apos; Week"
+      subtitle="Your upcoming walks and visits Mon → Sun. Print to stick on the fridge — handy for pet-sitters too."
     />
   )
 }

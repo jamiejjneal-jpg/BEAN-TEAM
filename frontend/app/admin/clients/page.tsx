@@ -332,7 +332,7 @@ export default function AdminClients() {
         <DialogContent>
           <DialogHeader><DialogTitle>{selectedClient?.full_name}&apos;s Dogs</DialogTitle></DialogHeader>
           {clientDogs.length === 0 ? (
-            <p className="text-sm text-[#8A8A8A] py-4 text-center">No dogs registered</p>
+            <p className="text-sm text-[#8A8A8A] py-4 text-center">No pets registered</p>
           ) : (
             <div className="space-y-2">
               {clientDogs.map(d => (
@@ -354,7 +354,7 @@ export default function AdminClients() {
           <DialogHeader>
             <DialogTitle className="text-[#E06D53]">Delete client permanently?</DialogTitle>
             <DialogDescription>
-              This permanently removes <strong>{deleteConfirm?.full_name || deleteConfirm?.email}</strong>, their login, profile, and any dogs they own. Past walk logs stay for auditing. This cannot be undone.
+              This permanently removes <strong>{deleteConfirm?.full_name || deleteConfirm?.email}</strong>, their login, profile, and any pets they own. Past walk logs stay for auditing. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="rounded-lg border border-[#E5E3DB] bg-[#F9F8F6] p-3 text-sm text-[#3C3C3C]">

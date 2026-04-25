@@ -11,7 +11,7 @@ import { Users, Dog, CalendarDays, MapPin, Clock, Mail, Loader2, Download, X } f
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { formatDate, formatTime, BOOKING_STATUSES } from '@/lib/utils'
 import { toast } from 'sonner'
-import { exportClients, exportDogs, exportBookings } from '@/lib/exports'
+import { exportClients, exportPets, exportBookings } from '@/lib/exports'
 import { logAudit } from '@/lib/audit'
 import { LastLoginCard } from '@/components/shared/LastLoginCard'
 import { SpeciesBreakdownWidget } from '@/components/shared/SpeciesBreakdownWidget'
@@ -136,17 +136,17 @@ export default function AdminDashboard() {
             variant="outline"
             size="sm"
             onClick={async () => {
-              toast.loading('Preparing dogs export...', { id: 'exp-dogs' })
+              toast.loading('Preparing pets export...', { id: 'exp-pets' })
               try {
-                await exportDogs()
-                toast.success('Dogs exported', { id: 'exp-dogs' })
+                await exportPets()
+                toast.success('Pets exported', { id: 'exp-pets' })
               } catch (e: any) {
-                toast.error(e.message || 'Export failed', { id: 'exp-dogs' })
+                toast.error(e.message || 'Export failed', { id: 'exp-pets' })
               }
             }}
-            data-testid="export-dogs-button"
+            data-testid="export-pets-button"
           >
-            <Download className="h-4 w-4 mr-2" /> Export Dogs (.xlsx)
+            <Download className="h-4 w-4 mr-2" /> Export Pets (.xlsx)
           </Button>
           <Button
             variant="outline"

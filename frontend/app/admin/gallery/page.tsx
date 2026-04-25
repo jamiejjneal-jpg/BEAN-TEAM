@@ -131,7 +131,7 @@ export default function AdminGallery() {
 
   async function handleUpload() {
     if (!uploadFile) { toast.error('Choose a photo to upload'); return }
-    if (!selectedBooking && !selectedDog) { toast.error('Pick a booking OR tag a dog'); return }
+    if (!selectedBooking && !selectedDog) { toast.error('Pick a booking OR tag a pet'); return }
     setUploading(true)
     const ext = uploadFile.name.split('.').pop()?.toLowerCase() || 'jpg'
     const folder = selectedBooking ? `walks/${selectedBooking}` : `dogs/${selectedDog || 'adhoc'}`
@@ -164,7 +164,7 @@ export default function AdminGallery() {
           const { data: owner } = await supabase
             .from('profiles').select('email, full_name')
             .eq('id', ownerId).maybeSingle()
-          const dogName = dog?.name || 'your dog'
+          const dogName = dog?.name || 'your pet'
           await sendNotification({
             kind: 'photo_added',
             toUserId: ownerId,
@@ -327,13 +327,13 @@ export default function AdminGallery() {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-[#8A8A8A]">Link to a walk if this photo is from one — otherwise leave empty and tag the dog below.</p>
+              <p className="text-xs text-[#8A8A8A]">Link to a walk if this photo is from one — otherwise leave empty and tag the pet below.</p>
             </div>
 
             <div className="space-y-2">
-              <Label>Tag a dog <span className="text-[#E06D53]">*</span> <span className="text-[#8A8A8A] text-xs font-normal">(so it shows on the client&apos;s dog page)</span></Label>
+              <Label>Tag a pet <span className="text-[#E06D53]">*</span> <span className="text-[#8A8A8A] text-xs font-normal">(so it shows on the client&apos;s pet page)</span></Label>
               <Select value={selectedDog} onValueChange={setSelectedDog}>
-                <SelectTrigger data-testid="select-upload-dog"><SelectValue placeholder="Pick a dog" /></SelectTrigger>
+                <SelectTrigger data-testid="select-upload-pet"><SelectValue placeholder="Pick a pet" /></SelectTrigger>
                 <SelectContent className="max-h-60">
                   {dogs.map((d: any) => (
                     <SelectItem key={d.id} value={d.id}>

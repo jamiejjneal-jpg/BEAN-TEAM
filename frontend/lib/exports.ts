@@ -40,7 +40,7 @@ export async function exportClients() {
   download(rows, 'Clients', `rockys-clients-${today()}.xlsx`)
 }
 
-export async function exportDogs() {
+export async function exportPets() {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('dogs')
@@ -48,9 +48,15 @@ export async function exportDogs() {
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
 
+  const SPECIES_LABEL: Record<string, string> = {
+    dog: 'Dog', cat: 'Cat', rabbit: 'Rabbit', bird: 'Bird',
+    fish: 'Fish', reptile: 'Reptile', small_mammal: 'Small Mammal',
+  }
+
   const rows = (data || []).map((d: any) => ({
-    'Dog Name': d.name || '',
-    'Breed': d.breed || '',
+    'Pet Name': d.name || '',
+    'Species': SPECIES_LABEL[d.species] || 'Dog',
+    'Breed / Type': d.breed || '',
     'Age (yrs)': d.age ?? '',
     'Weight (kg)': d.weight ?? '',
     'Size': d.size || '',
@@ -65,13 +71,14 @@ export async function exportDogs() {
     'Food Type': d.food_type || '',
     'Food Schedule': d.food_schedule || '',
     'Temperament': d.temperament || '',
-    'Good With Dogs': d.good_with_dogs ? 'Yes' : 'No',
+    'Good With Other Pets': d.good_with_dogs ? 'Yes' : 'No',
     'Good With Children': d.good_with_children ? 'Yes' : 'No',
-    'Vet Name': d.vet_name || '',
-    'Vet Phone': d.vet_phone || '',
-    'Vet Address': d.vet_address || '',
-    'Dog Emergency Contact': d.emergency_contact || '',
-    'Dog Emergency Phone': d.emergency_phone || '',
+    'Vet / Practitioner Name': d.vet_name || '',
+    'Vet / Practitioner Phone': d.vet_phone || '',
+    'Vet / Practitioner Address': d.vet_address || '',
+    'Pet Emergency Contact': d.emergency_contact || '',
+    'Pet Emergency Phone': d.emergency_phone || '',
+    'Species-specific details': d.details ? JSON.stringify(d.details) : '',
     'Special Notes': d.special_notes || '',
     'Owner Name': d.owner?.full_name || '',
     'Owner Email': d.owner?.email || '',
@@ -79,7 +86,7 @@ export async function exportDogs() {
     'Active': d.is_active ? 'Yes' : 'No',
     'Added': formatDate(d.created_at),
   }))
-  download(rows, 'Dogs', `rockys-dogs-${today()}.xlsx`)
+  download(rows, 'Pets', `rockys-pets-${today()}.xlsx`)
 }
 
 export async function exportBookings() {

@@ -90,8 +90,8 @@ function RegisterForm() {
   }
 
   const roles = [
-    { value: 'client', label: 'Client', desc: 'Book walks for your dog', icon: Dog },
-    { value: 'walker', label: 'Walker', desc: 'Walk dogs and earn', icon: Users },
+    { value: 'client', label: 'Client', desc: 'Book walks and visits for your pet', icon: Dog },
+    { value: 'walker', label: 'Walker', desc: 'Walk dogs and care for pets', icon: Users },
   ]
 
   return (
