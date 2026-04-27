@@ -82,12 +82,25 @@ export default function AdminGallery() {
 
   async function handleDelete() {
     if (!deleteConfirm) return
+    // 1) Best-effort delete the storage object (silent if path can't be derived)
     try {
       const url = new URL(deleteConfirm.photo_url)
       const pathMatch = url.pathname.match(/\/dog-photos\/(.+)/)
       if (pathMatch) await supabase.storage.from('dog-photos').remove([pathMatch[1].split('?')[0]])
     } catch { /* ignore */ }
-    await supabase.from('walk_logs').delete().eq('id', deleteConfirm.id)
+    // 2) Decide what to remove. If the row has only a photo (no walker logs etc),
+    // we delete it. If event_type !== 'photo', we just clear the photo_url so
+    // the booking timeline event survives.
+    if (deleteConfirm.event_type === 'photo') {
+      const { error } = await supabase.from('walk_logs').delete().eq('id', deleteConfirm.id)
+      if (error) {
+        toast.error('Failed to delete: ' + error.message + ' (likely an RLS policy — see fix below)')
+        return
+      }
+    } else {
+      const { error } = await supabase.from('walk_logs').update({ photo_url: null, caption: null }).eq('id', deleteConfirm.id)
+      if (error) { toast.error('Failed to remove photo: ' + error.message); return }
+    }
     toast.success('Photo deleted')
     setDeleteConfirm(null)
     if (lightbox?.id === deleteConfirm.id) setLightbox(null)
@@ -188,9 +201,10 @@ export default function AdminGallery() {
   async function saveCaption() {
     if (!lightbox) return
     const { error } = await supabase.from('walk_logs').update({ caption: captionDraft }).eq('id', lightbox.id)
-    if (error) { toast.error('Failed to save'); return }
+    if (error) { toast.error('Failed to save caption: ' + error.message); return }
     setLightbox({ ...lightbox, caption: captionDraft })
     setEditingCaption(false)
+    // Refresh the grid so the caption preview line updates
     fetchPhotos()
     toast.success('Caption updated')
   }
@@ -214,16 +228,32 @@ export default function AdminGallery() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {photos.map(p => (
-            <div key={p.id} className="group relative aspect-square rounded-xl overflow-hidden border border-[#E5E3DB]">
+            <div key={p.id} className="group relative aspect-square rounded-xl overflow-hidden border border-[#E5E3DB] bg-[#F9F8F6]">
               <img src={p.photo_url} alt="Walk photo" className="w-full h-full object-cover cursor-pointer" onClick={() => { setLightbox(p); setCaptionDraft(p.caption || '') }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="absolute bottom-0 left-0 right-0 p-2">
-                  <p className="text-white text-xs truncate">{p.booking?.dog?.name} | {p.booking?.walker?.full_name || 'Admin'}</p>
-                  <p className="text-white/60 text-[10px]">{formatDate(p.created_at)}</p>
-                </div>
-                <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(p) }} className="absolute top-2 right-2 h-7 w-7 rounded-full bg-red-500/80 text-white flex items-center justify-center hover:bg-red-600" data-testid={`delete-photo-${p.id}`}>
+              {/* Always-visible action buttons (top-right) */}
+              <div className="absolute top-1.5 right-1.5 flex gap-1.5">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setLightbox(p); setCaptionDraft(p.caption || ''); setEditingCaption(true) }}
+                  className="h-8 w-8 rounded-full bg-white/95 text-[#1A4331] shadow-md flex items-center justify-center hover:bg-white hover:scale-110 transition-all"
+                  data-testid={`edit-photo-${p.id}`}
+                  aria-label="Edit caption"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDeleteConfirm(p) }}
+                  className="h-8 w-8 rounded-full bg-red-500 text-white shadow-md flex items-center justify-center hover:bg-red-600 hover:scale-110 transition-all"
+                  data-testid={`delete-photo-${p.id}`}
+                  aria-label="Delete photo"
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
+              </div>
+              {/* Bottom info gradient */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 pointer-events-none">
+                <p className="text-white text-xs truncate">{p.booking?.dog?.name} | {p.booking?.walker?.full_name || 'Admin'}</p>
+                <p className="text-white/70 text-[10px]">{formatDate(p.created_at)}</p>
+                {p.caption && <p className="text-white/90 text-[11px] italic truncate mt-0.5">&ldquo;{p.caption}&rdquo;</p>}
               </div>
             </div>
           ))}
