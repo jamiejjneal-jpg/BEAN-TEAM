@@ -37,6 +37,31 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - Sidebar items added: "Weekly Calendar" and "Email Center".
 
 
+### Feb 15 2026 — Phase 2 future-proofing (Reviews, iCal, PWA, Analytics, Tests)
+
+**Walker reviews & ratings**
+- New SQL: `/app/supabase/migrations/20260421_walker_reviews.sql` — table + RLS + auto-recompute trigger that updates `walker_profiles.rating` & `total_reviews` on every insert/update/delete.
+- `/app/frontend/components/shared/Reviews.tsx` — `ReviewBookingForm` (1-5 stars + comment) and `WalkerReviewsList` (public list).
+
+**iCal export**
+- `/app/frontend/lib/ical.ts` — RFC 5545 generator with `downloadICS()` helper.
+- Added "Add to my calendar" button on `/client/bookings` (header — bulk export of upcoming) and per-card "Add to calendar" for individual events.
+
+**PWA**
+- `/app/frontend/public/manifest.json` (Rocky's logo, theme #1A4331, standalone display).
+- Layout exports `manifest`, `themeColor`, `appleWebApp` so iOS users can "Add to Home Screen".
+
+**Analytics dashboard**
+- New `/admin/analytics` page with: total revenue (all-time + last 30d), bookings count, repeat-booking rate, top walker, revenue by service (horizontal bars), 6-month trend (vertical bars), peak booking days (DOW chart). All native CSS — no chart libraries.
+- Sidebar: "Analytics" link added between Weekly Calendar and Email Center.
+
+**Walker mobile-first tweaks**
+- Walker walks page action buttons (Pickup, Drop-off, Photo, Note) now `h-12` on mobile, full-width — touch-target friendly for outdoor one-handed use.
+
+**Playwright smoke tests**
+- `/app/frontend/tests/smoke.spec.ts` + `playwright.config.ts` — covers public pages, sitemap/robots, login, admin nav (Bookings → Pets → Analytics), Add Booking dialog open. Run with `yarn playwright test`.
+
+
 ### Feb 15 2026 — Future-proofing pass
 - New legal/SEO routes: `/privacy`, `/terms`, `/sitemap.xml`, `/robots.txt`.
 - Layout: added Open Graph + Twitter Card metadata, Schema.org `LocalBusiness` JSON-LD, and `<link rel=preconnect>` to Supabase for ~150-300ms faster first DB call.

@@ -224,37 +224,37 @@ export default function WalkerWalks() {
                       )}
                     </div>
 
-                    <div className="flex flex-col gap-2 min-w-[180px]">
+                    <div className="flex flex-col gap-2 w-full sm:w-auto sm:min-w-[180px]">
                       {eventActions.map((action) => (
                         <Button
                           key={action.type}
-                          size="sm"
+                          size="lg"
                           disabled={loggedEvents.includes(action.type)}
-                          className={`text-white ${loggedEvents.includes(action.type) ? 'opacity-40' : action.color}`}
+                          className={`text-white h-12 sm:h-9 text-base sm:text-sm ${loggedEvents.includes(action.type) ? 'opacity-40' : action.color}`}
                           onClick={() => logEvent(walk.id, action.type)}
                           data-testid={`walk-action-${action.type}-${walk.id}`}
                         >
-                          <action.icon className="h-4 w-4 mr-1" />
+                          <action.icon className="h-5 w-5 sm:h-4 sm:w-4 mr-1.5" />
                           {action.label}
                         </Button>
                       ))}
 
                       <Button
-                        size="sm"
+                        size="lg"
                         variant="outline"
-                        className="border-[#DDA74F] text-[#DDA74F] hover:bg-[#DDA74F]/10"
+                        className="border-[#DDA74F] text-[#DDA74F] hover:bg-[#DDA74F]/10 h-12 sm:h-9 text-base sm:text-sm"
                         onClick={() => triggerPhotoUpload(walk.id)}
                         disabled={uploadingPhoto === walk.id}
                         data-testid={`upload-photo-${walk.id}`}
                       >
                         {uploadingPhoto === walk.id ? (
-                          <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Uploading...</>
+                          <><Loader2 className="h-5 w-5 sm:h-4 sm:w-4 mr-1.5 animate-spin" /> Uploading...</>
                         ) : (
-                          <><Camera className="h-4 w-4 mr-1" /> Upload Photo</>
+                          <><Camera className="h-5 w-5 sm:h-4 sm:w-4 mr-1.5" /> Upload Photo</>
                         )}
                       </Button>
 
-                      <Button size="sm" variant="outline" onClick={() => setSelectedWalk(selectedWalk === walk.id ? null : walk.id)} data-testid={`add-note-${walk.id}`}>
+                      <Button size="lg" variant="outline" className="h-12 sm:h-9 text-base sm:text-sm" onClick={() => setSelectedWalk(selectedWalk === walk.id ? null : walk.id)} data-testid={`add-note-${walk.id}`}>
                         Add Note
                       </Button>
 

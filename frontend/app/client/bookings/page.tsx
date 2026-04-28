@@ -11,8 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { formatDate, formatTime, BOOKING_STATUSES } from '@/lib/utils'
+import { downloadICS } from '@/lib/ical'
 import { toast } from 'sonner'
-import { Star, X } from 'lucide-react'
+import { Star, X, Calendar, Download } from 'lucide-react'
 
 export default function ClientBookings() {
   const { user } = useAuth()
@@ -83,10 +84,23 @@ export default function ClientBookings() {
             <p className="capitalize">{booking.walk_type} | {booking.duration_minutes} min</p>
             {booking.pickup_address && <p>Pickup: {booking.pickup_address}</p>}
           </div>
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-4 flex-wrap">
             {booking.status === 'pending' && (
               <Button size="sm" variant="destructive" onClick={() => cancelBooking(booking.id)} data-testid={`cancel-booking-${booking.id}`}>
                 <X className="h-3.5 w-3.5 mr-1" /> Cancel
+              </Button>
+            )}
+            {(['pending','confirmed','in_progress'].includes(booking.status)) && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  downloadICS([booking], `rocky-booking-${booking.id.slice(0,8)}.ics`)
+                  toast.success('Calendar event downloaded')
+                }}
+                data-testid={`add-to-calendar-${booking.id}`}
+              >
+                <Calendar className="h-3.5 w-3.5 mr-1" /> Add to calendar
               </Button>
             )}
             {booking.status === 'completed' && !hasReview && booking.walker_id && (
@@ -109,9 +123,24 @@ export default function ClientBookings() {
 
   return (
     <div className="space-y-6" data-testid="client-bookings-page">
-      <div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">My Bookings</h1>
-        <p className="text-[#5C5C5C] mt-1">{bookings.length} total booking{bookings.length !== 1 ? 's' : ''}</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">My Bookings</h1>
+          <p className="text-[#5C5C5C] mt-1">{bookings.length} total booking{bookings.length !== 1 ? 's' : ''}</p>
+        </div>
+        {active.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              downloadICS(active, 'rockys-upcoming-bookings.ics', "Rocky's Upcoming Walks")
+              toast.success('Calendar file downloaded — open it to add to Apple/Google Calendar')
+            }}
+            data-testid="export-ical-button"
+          >
+            <Download className="h-3.5 w-3.5 mr-1.5" /> Add to my calendar
+          </Button>
+        )}
       </div>
 
       <Tabs defaultValue="active">

@@ -40,7 +40,10 @@ export const metadata: Metadata = {
     images: ['/rocky-hero.jpg'],
   },
   robots: { index: true, follow: true },
-  icons: { icon: '/favicon.ico' },
+  manifest: '/manifest.json',
+  themeColor: '#1A4331',
+  appleWebApp: { capable: true, title: "Rocky's", statusBarStyle: 'default' },
+  icons: { icon: '/favicon.ico', apple: '/rocky-square.jpg' },
 }
 
 const localBusinessSchema = {

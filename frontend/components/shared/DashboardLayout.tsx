@@ -8,7 +8,7 @@ import NotificationBell from '@/components/shared/NotificationBell'
 import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard, Users, CalendarDays, Dog, MapPin, Star,
-  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell
+  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -22,6 +22,7 @@ const navItems = {
     { href: '/admin/pets', label: 'Pets', icon: Dog },
     { href: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
     { href: '/admin/calendar', label: 'Weekly Calendar', icon: Printer },
+    { href: '/admin/analytics', label: 'Analytics', icon: TrendingUp },
     { href: '/admin/email', label: 'Email Center', icon: Mail },
     { href: '/admin/gallery', label: 'Gallery', icon: Camera },
     { href: '/admin/team', label: 'Team', icon: Shield },
