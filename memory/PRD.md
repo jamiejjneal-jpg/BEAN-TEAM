@@ -37,6 +37,15 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - Sidebar items added: "Weekly Calendar" and "Email Center".
 
 
+### Feb 15 2026 — Future-proofing pass
+- New legal/SEO routes: `/privacy`, `/terms`, `/sitemap.xml`, `/robots.txt`.
+- Layout: added Open Graph + Twitter Card metadata, Schema.org `LocalBusiness` JSON-LD, and `<link rel=preconnect>` to Supabase for ~150-300ms faster first DB call.
+- Backups: `/app/supabase/functions/db-backup/index.ts` weekly Edge Function emails JSON snapshot of all 9 core tables to admin via Resend.
+- Retention: `/app/supabase/migrations/20260420_retention.sql` — pg_cron purges audit_log after 12 months, login_history after 90 days.
+- Security runbook: `/app/memory/SECURITY.md` with key-rotation procedures, hardening checklist, and incident response template.
+- Footer now links to /privacy and /terms.
+
+
 ### Feb 15 2026 — Multi-Pet Migration (Dogs → Pets)
 - Business expanded from dogs-only to multi-pet: **Dog, Cat, Rabbit, Bird, Fish, Reptile, Small Mammal**.
 - Naming: user-facing copy now says "Pet"; DB table is still `dogs` (low-risk migration — adds columns, keeps FKs/RLS intact).

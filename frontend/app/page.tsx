@@ -159,7 +159,14 @@ export default function LandingPage() {
               <PawPrint className="h-5 w-5 text-[#1A4331]" />
               <span className="font-heading font-bold text-[#1A4331]">Rocky&apos;s Retreat and Rambles</span>
             </div>
-            <p className="text-sm text-[#8A8A8A]">2025 Rocky&apos;s Retreat and Rambles. All rights reserved. <Link href="/pricing" className="hover:text-[#1A4331]">Pricing</Link></p>
+            <p className="text-sm text-[#8A8A8A]">
+              2025 Rocky&apos;s Retreat and Rambles. All rights reserved.
+              <Link href="/pricing" className="ml-3 hover:text-[#1A4331]">Pricing</Link>
+              <span className="mx-2">·</span>
+              <Link href="/privacy" className="hover:text-[#1A4331]" data-testid="footer-privacy">Privacy</Link>
+              <span className="mx-2">·</span>
+              <Link href="/terms" className="hover:text-[#1A4331]" data-testid="footer-terms">Terms</Link>
+            </p>
           </div>
         </div>
       </footer>
