@@ -238,3 +238,11 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - **Walker page `/walker/unavailability`** upgraded — status badges, recurring pattern picker, ongoing toggle, rejection reason shown back, withdraw button for pending only.
 - **Notifications** — walkers get in-app + email via `bulk-mail` when admin approves/rejects/creates time off. Admins get in-app when a walker submits a new request (`lib/notifyTimeOff.ts`).
 - New admin sidebar link "Time Off".
+
+
+### Feb 2026 (Fork — Regular walks + site footer + availability guard)
+- **Recurring walks UI** — new `/client/recurring` page (clients create "Mon/Wed/Fri 12:30 for Max" templates; app auto-generates first 8 weeks of bookings + "Extend 4w" button) and `/admin/recurring` overview (pause/resume/extend/delete any client template). Both sidebars updated.
+- **`bookings.recurring_template_id` link column** — migration `20260430_recurring_link.sql` so pausing/deleting a template cleans up its upcoming bookings.
+- **Availability soft-check on `/client/book`** — when client picks a date, walkers with approved time off for that day are disabled in the dropdown with a 🏖️ indicator and "— on leave" suffix. Uses `lib/availability.ts` (handles one-off, weekly and block-N-weeks patterns).
+- **Admin reject dialog textbox** — already present (required on reject); confirmed working.
+- **Copyright footer** — new `<SiteFooter>` component, added to every dashboard page + landing + pricing + privacy + terms. Reads *"© YYYY Rocky’s Retreat and Rambles · Built with ♥ by Jamie Neal. All rights reserved."*

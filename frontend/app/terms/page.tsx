@@ -73,6 +73,10 @@ export default function TermsPage() {
 
         <Link href="/" className="inline-block text-sm text-[#1A4331] hover:underline">&larr; Back to homepage</Link>
       </main>
+
+      <footer className="py-6 text-center text-xs text-[#9C8E7A]">
+        © {new Date().getFullYear()} Rocky&apos;s Retreat and Rambles · Built with <span aria-hidden>♥</span> by <span className="font-medium">Jamie Neal</span>. All rights reserved.
+      </footer>
     </div>
   )
 }

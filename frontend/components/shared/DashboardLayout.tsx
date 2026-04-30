@@ -8,9 +8,10 @@ import NotificationBell from '@/components/shared/NotificationBell'
 import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard, Users, CalendarDays, Dog, MapPin, Star,
-  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp, Plane
+  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp, Plane, Repeat
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { SiteFooter } from '@/components/shared/SiteFooter'
 
 const profileHref = { admin: '/admin/profile', walker: '/walker/profile', client: '/client/profile' } as const
 
@@ -21,6 +22,7 @@ const navItems = {
     { href: '/admin/clients', label: 'Clients', icon: Users },
     { href: '/admin/pets', label: 'Pets', icon: Dog },
     { href: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
+    { href: '/admin/recurring', label: 'Regular Walks', icon: Repeat },
     { href: '/admin/time-off', label: 'Time Off', icon: Plane },
     { href: '/admin/calendar', label: 'Weekly Calendar', icon: Printer },
     { href: '/admin/analytics', label: 'Analytics', icon: TrendingUp },
@@ -45,6 +47,7 @@ const navItems = {
     { href: '/client', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/client/pets', label: 'My Pets', icon: Dog },
     { href: '/client/book', label: 'Book Walk', icon: MapPin },
+    { href: '/client/recurring', label: 'Regular Walks', icon: Repeat },
     { href: '/client/bookings', label: 'My Bookings', icon: ClipboardList },
     { href: '/client/calendar', label: 'Calendar', icon: Printer },
     { href: '/client/gallery', label: 'Walk Gallery', icon: Camera },
@@ -248,6 +251,7 @@ export default function DashboardLayout({
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {children}
+          <SiteFooter />
         </main>
       </div>
     </div>

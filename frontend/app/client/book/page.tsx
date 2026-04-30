@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation'
 import { CalendarDays, Dog, CheckCircle, AlertCircle, ArrowRight, Construction } from 'lucide-react'
 import { speciesConfig, type PetSpecies } from '@/lib/species'
 import Link from 'next/link'
+import { walkersUnavailableOn } from '@/lib/availability'
 
 export default function BookWalk() {
   const { user } = useAuth()
@@ -24,6 +25,7 @@ export default function BookWalk() {
   const [allPets, setAllPets] = useState<any[]>([])
   const [profile, setProfile] = useState<any>(null)
   const [walkers, setWalkers] = useState<any[]>([])
+  const [unavailableWalkerIds, setUnavailableWalkerIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -34,6 +36,19 @@ export default function BookWalk() {
   const supabase = createClient()
 
   useEffect(() => { if (user) fetchData() }, [user])
+
+  // Recompute unavailable walkers whenever the date changes
+  useEffect(() => {
+    if (!form.scheduled_date || walkers.length === 0) {
+      setUnavailableWalkerIds(new Set())
+      return
+    }
+    let cancelled = false
+    walkersUnavailableOn(walkers.map(w => w.id), form.scheduled_date).then(set => {
+      if (!cancelled) setUnavailableWalkerIds(set)
+    })
+    return () => { cancelled = true }
+  }, [form.scheduled_date, walkers])
 
   async function fetchData() {
     const [petsRes, walkersRes, profileRes] = await Promise.all([
@@ -249,16 +264,42 @@ export default function BookWalk() {
           <Card>
             <CardHeader><CardTitle>Preferred Walker (Optional)</CardTitle></CardHeader>
             <CardContent>
-              <Select value={form.walker_id} onValueChange={(v) => setForm({ ...form, walker_id: v })}>
-                <SelectTrigger data-testid="select-walker"><SelectValue placeholder="Any available walker" /></SelectTrigger>
+              <Select
+                value={form.walker_id}
+                onValueChange={(v) => {
+                  if (unavailableWalkerIds.has(v)) {
+                    toast.error('That walker has approved time off on this date — pick another or change the date.')
+                    return
+                  }
+                  setForm({ ...form, walker_id: v })
+                }}
+              >
+                <SelectTrigger data-testid="select-walker"><SelectValue placeholder={form.scheduled_date ? 'Any available walker' : 'Pick a date first to filter availability'} /></SelectTrigger>
                 <SelectContent>
-                  {walkers.map((w: any) => (
-                    <SelectItem key={w.id} value={w.id}>
-                      {w.full_name} - ${Number(w.walker_profiles?.hourly_rate || 15).toFixed(2)}/hr ({Number(w.walker_profiles?.rating || 0).toFixed(1)} stars)
-                    </SelectItem>
-                  ))}
+                  {walkers.map((w: any) => {
+                    const off = unavailableWalkerIds.has(w.id)
+                    return (
+                      <SelectItem
+                        key={w.id}
+                        value={w.id}
+                        disabled={off}
+                        className={off ? 'opacity-40 cursor-not-allowed' : ''}
+                        data-testid={`walker-option-${w.id}${off ? '-off' : ''}`}
+                      >
+                        <span className="flex items-center gap-2">
+                          {off && <span title="On leave for this date" aria-label="On leave">🏖️</span>}
+                          <span>{w.full_name} - ${Number(w.walker_profiles?.hourly_rate || 15).toFixed(2)}/hr ({Number(w.walker_profiles?.rating || 0).toFixed(1)} stars){off ? ' — on leave' : ''}</span>
+                        </span>
+                      </SelectItem>
+                    )
+                  })}
                 </SelectContent>
               </Select>
+              {form.scheduled_date && unavailableWalkerIds.size > 0 && (
+                <p className="text-xs text-[#8A8A8A] mt-2">
+                  {unavailableWalkerIds.size} walker{unavailableWalkerIds.size === 1 ? '' : 's'} on leave for {form.scheduled_date} — greyed out above.
+                </p>
+              )}
             </CardContent>
           </Card>
 

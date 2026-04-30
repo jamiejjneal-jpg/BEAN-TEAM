@@ -185,8 +185,9 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <footer className="py-10 text-center text-sm text-[#8A8A8A]">
+      <footer className="py-8 text-center text-sm text-[#8A8A8A] space-y-2">
         <Link href="/" className="hover:text-[#1A4331]">&larr; Back to home</Link>
+        <p className="text-xs text-[#9C8E7A]">© {new Date().getFullYear()} Rocky’s Retreat and Rambles · Built with <span aria-hidden>♥</span> by <span className="font-medium">Jamie Neal</span>. All rights reserved.</p>
       </footer>
     </div>
   )

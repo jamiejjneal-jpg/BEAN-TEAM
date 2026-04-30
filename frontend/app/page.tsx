@@ -160,7 +160,7 @@ export default function LandingPage() {
               <span className="font-heading font-bold text-[#1A4331]">Rocky&apos;s Retreat and Rambles</span>
             </div>
             <p className="text-sm text-[#8A8A8A]">
-              2025 Rocky&apos;s Retreat and Rambles. All rights reserved.
+              © {new Date().getFullYear()} Rocky&apos;s Retreat and Rambles · Built with <span aria-hidden>♥</span> by <span className="font-medium text-[#1A4331]">Jamie Neal</span>. All rights reserved.
               <Link href="/pricing" className="ml-3 hover:text-[#1A4331]">Pricing</Link>
               <span className="mx-2">·</span>
               <Link href="/privacy" className="hover:text-[#1A4331]" data-testid="footer-privacy">Privacy</Link>
