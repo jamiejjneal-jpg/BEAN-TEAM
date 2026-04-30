@@ -220,3 +220,12 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - Expanded `supabase/migrations/20260426_omnibus.sql` to also create `notifications` + `notification_prefs` tables (with RLS + indexes) so it is fully self-contained for user paste.
 - Edge Functions `user-erase` (GDPR Art. 17) and `storage-cleanup` (monthly bucket orphan sweep) delivered for user to paste into Supabase Dashboard.
 
+
+
+### Feb 2026 (Fork — Omnibus UI Hooks)
+- **NPS prompt** (`components/shared/NpsPrompt.tsx`) on client dashboard: appears once every 30 days after at least one completed walk; 0–10 score + optional comment; writes to `nps_responses`; dismiss snooze = 7 days.
+- **Walker time-off** (`/walker/unavailability`): new self-service page; walker adds/removes holiday/sick blocks via `walker_unavailability`; added to walker sidebar nav as "Time Off".
+- **Polished cancellation dialog** on `/client/bookings`: replaced `window.prompt` with reason picker (6 canned reasons + free-text); writes `cancellation_reason`, `cancelled_by`, `cancelled_at`. Reason is also shown on past-booking cards.
+- **Admin cancel/reject** now also writes the same three columns (`rejectBooking` + any `updateBooking` that sets status→cancelled).
+- **DBS / Insurance / First-Aid badges** already wired on `/client/walkers` cards — confirmed rendering off the new omnibus `walker_profiles` columns.
+- All 51 routes build cleanly.

@@ -12,6 +12,7 @@ import { Dog, CalendarDays, MapPin, Bell, Plus, Camera, CheckCircle2, ArrowRight
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { formatDate, formatTime, BOOKING_STATUSES } from '@/lib/utils'
 import { toast } from 'sonner'
+import { NpsPrompt } from '@/components/shared/NpsPrompt'
 
 function initialsFrom(name?: string | null, email?: string | null) {
   const src = (name || email || '').trim()
@@ -107,9 +108,10 @@ export default function ClientDashboard() {
         </Link>
       </div>
 
+      {ready && <NpsPrompt />}
+
       {!ready && (
-        <Card className="border-[#DDA74F]/30 bg-[#FDF8EF]" data-testid="onboarding-progress-card">
-          <CardContent className="p-6">
+        <Card className="border-[#DDA74F]/30 bg-[#FDF8EF]" data-testid="onboarding-progress-card">          <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="font-heading font-semibold text-[#1A1A1A]">Get ready to book walks</p>

@@ -91,6 +91,12 @@ export default function AdminBookings() {
   }
 
   async function updateBooking(id: string, updates: any) {
+    // Auto-populate cancellation columns when admin flips status to 'cancelled'
+    if (updates.status === 'cancelled') {
+      updates.cancellation_reason = updates.cancellation_reason || adminNotes || 'Cancelled by admin'
+      updates.cancelled_by = (await supabase.auth.getUser()).data.user?.id || null
+      updates.cancelled_at = new Date().toISOString()
+    }
     const { error } = await supabase.from('bookings').update(updates).eq('id', id)
     if (error) { toast.error('Failed to update'); return }
     toast.success('Booking updated')
@@ -130,9 +136,13 @@ export default function AdminBookings() {
       toast.error('Please provide a reason in the Admin Notes field')
       return
     }
+    const { data: { user: caller } } = await supabase.auth.getUser()
     const { error } = await supabase.from('bookings').update({
       status: 'cancelled',
       admin_notes: adminNotes,
+      cancellation_reason: adminNotes,
+      cancelled_by: caller?.id || null,
+      cancelled_at: new Date().toISOString(),
     }).eq('id', booking.id)
     if (error) { toast.error('Failed to reject: ' + error.message); return }
     if (booking.client_id) {

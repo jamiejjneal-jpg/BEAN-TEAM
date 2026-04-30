@@ -15,6 +15,15 @@ import { downloadICS } from '@/lib/ical'
 import { toast } from 'sonner'
 import { Star, X, Calendar, Download } from 'lucide-react'
 
+const CANCEL_REASONS = [
+  { v: 'plans_changed',  label: 'My plans changed' },
+  { v: 'pet_unwell',     label: 'Pet is unwell' },
+  { v: 'weather',        label: 'Weather / safety' },
+  { v: 'booked_wrong',   label: 'I booked the wrong slot' },
+  { v: 'financial',      label: 'Financial reasons' },
+  { v: 'other',          label: 'Something else' },
+] as const
+
 export default function ClientBookings() {
   const { user } = useAuth()
   const [bookings, setBookings] = useState<any[]>([])
@@ -22,6 +31,10 @@ export default function ClientBookings() {
   const [reviewDialog, setReviewDialog] = useState<any>(null)
   const [reviewRating, setReviewRating] = useState(5)
   const [reviewComment, setReviewComment] = useState('')
+  const [cancelTarget, setCancelTarget] = useState<any>(null)
+  const [cancelReasonKey, setCancelReasonKey] = useState<string>('plans_changed')
+  const [cancelNote, setCancelNote] = useState('')
+  const [cancelling, setCancelling] = useState(false)
   const supabase = createClient()
 
   useEffect(() => { if (user) fetchBookings() }, [user])
@@ -36,16 +49,23 @@ export default function ClientBookings() {
     setLoading(false)
   }
 
-  async function cancelBooking(id: string) {
-    if (typeof window === 'undefined') return
-    const reason = window.prompt("Why are you cancelling? (Optional — helps us improve)") || ''
-    await supabase.from('bookings').update({
+  async function submitCancel() {
+    if (!cancelTarget) return
+    setCancelling(true)
+    const label = CANCEL_REASONS.find(r => r.v === cancelReasonKey)?.label || 'Other'
+    const reason = cancelNote.trim() ? `${label} — ${cancelNote.trim()}` : label
+    const { error } = await supabase.from('bookings').update({
       status: 'cancelled',
-      cancellation_reason: reason.trim() || null,
+      cancellation_reason: reason,
       cancelled_by: user!.id,
       cancelled_at: new Date().toISOString(),
-    }).eq('id', id)
+    }).eq('id', cancelTarget.id)
+    setCancelling(false)
+    if (error) { toast.error('Could not cancel — please try again'); return }
     toast.success('Booking cancelled')
+    setCancelTarget(null)
+    setCancelReasonKey('plans_changed')
+    setCancelNote('')
     fetchBookings()
   }
 
@@ -91,10 +111,15 @@ export default function ClientBookings() {
             <p className="font-mono text-xs">{formatDate(booking.scheduled_date)} at {formatTime(booking.scheduled_time)}</p>
             <p className="capitalize">{booking.walk_type} | {booking.duration_minutes} min</p>
             {booking.pickup_address && <p>Pickup: {booking.pickup_address}</p>}
+            {booking.status === 'cancelled' && booking.cancellation_reason && (
+              <p className="text-xs italic text-[#9C6357] pt-1" data-testid={`cancel-reason-shown-${booking.id}`}>
+                Cancelled — {booking.cancellation_reason}
+              </p>
+            )}
           </div>
           <div className="flex gap-2 mt-4 flex-wrap">
             {booking.status === 'pending' && (
-              <Button size="sm" variant="destructive" onClick={() => cancelBooking(booking.id)} data-testid={`cancel-booking-${booking.id}`}>
+              <Button size="sm" variant="destructive" onClick={() => { setCancelTarget(booking); setCancelReasonKey('plans_changed'); setCancelNote('') }} data-testid={`cancel-booking-${booking.id}`}>
                 <X className="h-3.5 w-3.5 mr-1" /> Cancel
               </Button>
             )}
@@ -172,8 +197,45 @@ export default function ClientBookings() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={!!reviewDialog} onOpenChange={() => setReviewDialog(null)}>
-        <DialogContent>
+      {/* Cancellation dialog */}
+      <Dialog open={!!cancelTarget} onOpenChange={() => !cancelling && setCancelTarget(null)}>
+        <DialogContent data-testid="cancel-booking-dialog">
+          <DialogHeader>
+            <DialogTitle>Cancel this booking?</DialogTitle>
+            <DialogDescription>
+              {cancelTarget && `${cancelTarget.dog?.name || 'Walk'} on ${formatDate(cancelTarget.scheduled_date)} at ${formatTime(cancelTarget.scheduled_time)}.`}
+              {' '}Letting us know why helps Rocky improve scheduling for next time.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              {CANCEL_REASONS.map(r => (
+                <button
+                  key={r.v}
+                  type="button"
+                  onClick={() => setCancelReasonKey(r.v)}
+                  className={`text-left text-sm rounded-lg border p-3 transition-colors ${cancelReasonKey === r.v ? 'border-[#1A4331] bg-[#E8F0EC] ring-1 ring-[#1A4331]' : 'border-[#E5E3DB] hover:border-[#1A4331]'}`}
+                  data-testid={`cancel-reason-${r.v}`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-[#5C5C5C]">Anything else? (optional)</Label>
+              <Textarea value={cancelNote} onChange={e => setCancelNote(e.target.value)} placeholder="A quick note helps us understand…" data-testid="cancel-note" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelTarget(null)} disabled={cancelling}>Keep booking</Button>
+            <Button variant="destructive" onClick={submitCancel} disabled={cancelling} data-testid="confirm-cancel">
+              {cancelling ? 'Cancelling…' : 'Confirm cancellation'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!reviewDialog} onOpenChange={() => setReviewDialog(null)}>        <DialogContent>
           <DialogHeader>
             <DialogTitle>Rate Your Walk</DialogTitle>
             <DialogDescription>How was your experience with {reviewDialog?.walker?.full_name}?</DialogDescription>
