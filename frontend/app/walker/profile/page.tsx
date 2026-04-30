@@ -20,6 +20,7 @@ export default function WalkerProfile() {
   const [form, setForm] = useState({
     full_name: '', phone: '', address: '',
     bio: '', experience_years: 0, hourly_rate: 15, max_dogs: 3, service_area: '',
+    dbs_checked_date: '', insurance_expires: '', first_aid_trained: false,
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -43,6 +44,9 @@ export default function WalkerProfile() {
       hourly_rate: data?.hourly_rate || 15,
       max_dogs: data?.max_dogs || 3,
       service_area: data?.service_area || '',
+      dbs_checked_date: data?.dbs_checked_date || '',
+      insurance_expires: data?.insurance_expires || '',
+      first_aid_trained: !!data?.first_aid_trained,
     })
     setLoading(false)
   }
@@ -96,6 +100,9 @@ export default function WalkerProfile() {
         hourly_rate: form.hourly_rate,
         max_dogs: form.max_dogs,
         service_area: form.service_area,
+        dbs_checked_date: form.dbs_checked_date || null,
+        insurance_expires: form.insurance_expires || null,
+        first_aid_trained: form.first_aid_trained,
       }).eq('id', user!.id),
     ])
     await refreshProfile()
@@ -179,6 +186,19 @@ export default function WalkerProfile() {
             <div className="space-y-2"><Label>Max Dogs</Label><Input type="number" min={1} max={10} value={form.max_dogs} onChange={(e) => setForm({ ...form, max_dogs: parseInt(e.target.value) || 1 })} /></div>
           </div>
           <div className="space-y-2"><Label>Service Area</Label><Input value={form.service_area} onChange={(e) => setForm({ ...form, service_area: e.target.value })} placeholder="e.g. London SW, Manchester City Centre" /></div>
+
+          <div className="pt-4 mt-4 border-t border-[#E5E3DB]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#5C5C5C] mb-3">Trust &amp; Safety</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div className="space-y-2"><Label>DBS checked (date)</Label><Input type="date" value={form.dbs_checked_date} onChange={e => setForm({ ...form, dbs_checked_date: e.target.value })} data-testid="dbs-date" /></div>
+              <div className="space-y-2"><Label>Insurance expires</Label><Input type="date" value={form.insurance_expires} onChange={e => setForm({ ...form, insurance_expires: e.target.value })} data-testid="insurance-date" /></div>
+            </div>
+            <label className="flex items-center gap-2 mt-3 cursor-pointer">
+              <input type="checkbox" checked={form.first_aid_trained} onChange={e => setForm({ ...form, first_aid_trained: e.target.checked })} className="rounded border-[#E5E3DB]" data-testid="first-aid-toggle" />
+              <span className="text-sm">Pet First-Aid certified</span>
+            </label>
+            <p className="text-[11px] text-[#8A8A8A] mt-2">Shown as trust badges on your profile card to help new clients book with confidence.</p>
+          </div>
         </CardContent>
       </Card>
 

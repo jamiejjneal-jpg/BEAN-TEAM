@@ -150,7 +150,6 @@ export default function AdminClients() {
     if (!deleteConfirm) return
     setBusyId(deleteConfirm.id)
     try {
-      // Send farewell email BEFORE deletion (email must go before the auth user vanishes).
       if (deleteConfirm.email) {
         await triggerAutoEmail('leaving_client', { email: deleteConfirm.email, full_name: deleteConfirm.full_name })
       }
@@ -160,6 +159,37 @@ export default function AdminClients() {
       fetchClients()
     } catch (e: any) {
       toast.error(e.message || 'Failed to delete')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  // GDPR Article 17 — permanent erasure via Edge Function
+  async function handleGdprErase() {
+    if (!deleteConfirm) return
+    const confirmMsg = `⚠️ GDPR PERMANENT ERASE\n\nThis deletes ALL traces of ${deleteConfirm.full_name || deleteConfirm.email} — pets, bookings, reviews, login history, photos. Cannot be undone.\n\nType their email address to confirm:`
+    const typed = typeof window !== 'undefined' ? window.prompt(confirmMsg) : ''
+    if ((typed || '').trim().toLowerCase() !== (deleteConfirm.email || '').toLowerCase()) {
+      toast.error('Email did not match — erasure cancelled')
+      return
+    }
+    const keepBookings = typeof window !== 'undefined' ? window.confirm('Keep anonymised booking records for HMRC 6-year retention?') : true
+    setBusyId(deleteConfirm.id)
+    try {
+      const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/$/, '')
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/user-erase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ user_id: deleteConfirm.id, keep_bookings: keepBookings }),
+      })
+      const body = await res.json()
+      if (!res.ok || !body.ok) throw new Error(body.error || 'Erase failed')
+      toast.success('User permanently erased (GDPR Art. 17)')
+      setDeleteConfirm(null)
+      fetchClients()
+    } catch (e: any) {
+      toast.error(e.message || 'GDPR erase failed')
     } finally {
       setBusyId(null)
     }
@@ -376,10 +406,13 @@ export default function AdminClients() {
               Export all walks (Excel)
             </Button>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-wrap gap-2">
             <Button variant="outline" onClick={() => setDeleteConfirm(null)} disabled={!!busyId}>Cancel</Button>
             <Button variant="destructive" onClick={handleDelete} disabled={!!busyId} data-testid="confirm-delete-client">
               {busyId ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Deleting...</> : 'Delete permanently'}
+            </Button>
+            <Button variant="destructive" className="bg-[#6B0F0F] hover:bg-[#4A0A0A]" onClick={handleGdprErase} disabled={!!busyId} data-testid="gdpr-erase-client" title="GDPR Article 17 right to be forgotten">
+              🚨 GDPR Erase (all data)
             </Button>
           </DialogFooter>
         </DialogContent>

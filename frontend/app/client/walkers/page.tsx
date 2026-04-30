@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Star, MapPin, Clock, Users } from 'lucide-react'
+import { Star, MapPin, Clock, Users, Shield } from 'lucide-react'
 
 export default function BrowseWalkers() {
   const [walkers, setWalkers] = useState<any[]>([])
@@ -83,6 +83,24 @@ export default function BrowseWalkers() {
                     </div>
                   )}
 
+                  {/* Trust badges — show DBS / insurance / first-aid if recorded */}
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {wp.dbs_checked_date && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#E8F0EC] text-[#1A4331] border border-[#1A4331]/20" title={`DBS checked ${wp.dbs_checked_date}`}>
+                        <Shield className="h-3 w-3" /> DBS checked
+                      </span>
+                    )}
+                    {wp.insurance_expires && new Date(wp.insurance_expires) > new Date() && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#E8F0EC] text-[#1A4331] border border-[#1A4331]/20">
+                        <Shield className="h-3 w-3" /> Insured
+                      </span>
+                    )}
+                    {wp.first_aid_trained && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#FDF8EF] text-[#DDA74F] border border-[#DDA74F]/30">
+                        <Shield className="h-3 w-3" /> Pet First-Aid
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-[#8A8A8A] mt-3 font-mono">{wp.total_walks} walks completed</p>
                 </CardContent>
               </Card>

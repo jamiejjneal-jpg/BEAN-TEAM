@@ -29,7 +29,7 @@ export default function ClientBookings() {
   async function fetchBookings() {
     const { data } = await supabase
       .from('bookings')
-      .select('*, walker:profiles!bookings_walker_id_fkey(full_name), dog:dogs(name, breed), reviews(*)')
+      .select('*, walker:profiles!bookings_walker_id_fkey(full_name), dog:dogs(name, breed), reviews:walker_reviews(*)')
       .eq('client_id', user!.id)
       .order('scheduled_date', { ascending: false })
     setBookings(data || [])
@@ -37,22 +37,30 @@ export default function ClientBookings() {
   }
 
   async function cancelBooking(id: string) {
-    await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', id)
+    if (typeof window === 'undefined') return
+    const reason = window.prompt("Why are you cancelling? (Optional — helps us improve)") || ''
+    await supabase.from('bookings').update({
+      status: 'cancelled',
+      cancellation_reason: reason.trim() || null,
+      cancelled_by: user!.id,
+      cancelled_at: new Date().toISOString(),
+    }).eq('id', id)
     toast.success('Booking cancelled')
     fetchBookings()
   }
 
   async function submitReview() {
     if (!reviewDialog) return
-    const { error } = await supabase.from('reviews').insert({
+    const { error } = await supabase.from('walker_reviews').insert({
       booking_id: reviewDialog.id,
       client_id: user!.id,
       walker_id: reviewDialog.walker_id,
       rating: reviewRating,
-      comment: reviewComment,
+      comment: reviewComment || null,
+      is_public: true,
     })
-    if (error) { toast.error('Failed to submit review'); return }
-    toast.success('Review submitted!')
+    if (error) { toast.error('Failed to submit review: ' + error.message); return }
+    toast.success('Thanks for your review!')
     setReviewDialog(null)
     setReviewRating(5)
     setReviewComment('')
