@@ -21,6 +21,7 @@ const navItems = {
     { href: '/admin/clients', label: 'Clients', icon: Users },
     { href: '/admin/pets', label: 'Pets', icon: Dog },
     { href: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
+    { href: '/admin/time-off', label: 'Time Off', icon: Plane },
     { href: '/admin/calendar', label: 'Weekly Calendar', icon: Printer },
     { href: '/admin/analytics', label: 'Analytics', icon: TrendingUp },
     { href: '/admin/email', label: 'Email Center', icon: Mail },

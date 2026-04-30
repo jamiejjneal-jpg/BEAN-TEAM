@@ -229,3 +229,12 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - **Admin cancel/reject** now also writes the same three columns (`rejectBooking` + any `updateBooking` that sets status→cancelled).
 - **DBS / Insurance / First-Aid badges** already wired on `/client/walkers` cards — confirmed rendering off the new omnibus `walker_profiles` columns.
 - All 51 routes build cleanly.
+
+
+### Feb 2026 (Fork — Time-off approval workflow)
+- **Walker time-off requests now require admin approval** — new status/approval columns + RLS rules on `walker_unavailability`. Migration: `20260430_time_off_approval.sql`.
+- **Recurring patterns** — walker & admin can mark time off as: one-off, weekly (repeats on the start-date’s weekday), or block (every N weeks). `end_date` is now nullable for ongoing.
+- **Admin page `/admin/time-off`** — pending-approval queue with review dialog (approve/reject + note), plus "Add time off" button that writes an auto-approved record directly for any walker. Filter by walker; full history tabs (Pending / Approved / Rejected).
+- **Walker page `/walker/unavailability`** upgraded — status badges, recurring pattern picker, ongoing toggle, rejection reason shown back, withdraw button for pending only.
+- **Notifications** — walkers get in-app + email via `bulk-mail` when admin approves/rejects/creates time off. Admins get in-app when a walker submits a new request (`lib/notifyTimeOff.ts`).
+- New admin sidebar link "Time Off".
