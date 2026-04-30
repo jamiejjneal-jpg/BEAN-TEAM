@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Save, Camera, Loader2, X, Key, Phone, User, AlertCircle } from 'lucide-react'
 import { ChangePasswordCard } from '@/components/shared/ChangePasswordCard'
+import { CalendarSubscriptionCard } from '@/components/shared/CalendarSubscriptionCard'
 
 export default function ClientProfile() {
   const { user, profile, refreshProfile } = useAuth()
@@ -206,6 +207,8 @@ export default function ClientProfile() {
       <Button onClick={handleSave} disabled={saving || uploadingPhoto} className="w-full" data-testid="save-profile-button">
         {saving || uploadingPhoto ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Saving...</> : <><Save className="h-4 w-4 mr-2" /> Save Profile</>}
       </Button>
+
+      <CalendarSubscriptionCard />
 
       <ChangePasswordCard />
     </div>

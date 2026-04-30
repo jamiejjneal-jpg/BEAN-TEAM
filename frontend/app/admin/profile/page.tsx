@@ -11,6 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import { Save, Camera, Loader2, X } from 'lucide-react'
 import { ChangePasswordCard } from '@/components/shared/ChangePasswordCard'
+import { CalendarSubscriptionCard } from '@/components/shared/CalendarSubscriptionCard'
 
 function initialsFrom(name?: string | null, email?: string | null) {
   const src = (name || email || '').trim()
@@ -151,6 +152,8 @@ export default function AdminProfile() {
       <Button onClick={handleSave} disabled={saving || uploadingPhoto} className="w-full" data-testid="admin-save-profile">
         {saving || uploadingPhoto ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Saving...</> : <><Save className="h-4 w-4 mr-2" /> Save profile</>}
       </Button>
+
+      <CalendarSubscriptionCard />
 
       <ChangePasswordCard />
     </div>
