@@ -246,3 +246,11 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - **Availability soft-check on `/client/book`** — when client picks a date, walkers with approved time off for that day are disabled in the dropdown with a 🏖️ indicator and "— on leave" suffix. Uses `lib/availability.ts` (handles one-off, weekly and block-N-weeks patterns).
 - **Admin reject dialog textbox** — already present (required on reject); confirmed working.
 - **Copyright footer** — new `<SiteFooter>` component, added to every dashboard page + landing + pricing + privacy + terms. Reads *"© YYYY Rocky’s Retreat and Rambles · Built with ♥ by Jamie Neal. All rights reserved."*
+
+
+### Feb 2026 (Fork — Bulk approve recurring walks)
+- **Admin /admin/bookings** — pending bookings that share a `recurring_template_id` are now collapsed into a single green banner "Client · Pet · Mon/Wed/Fri at 12:30 — N pending walks".
+- **"Approve all N" button** assigns the client's preferred walker (pre-filled from the recurring template) to every booking in the group with one click + sends a single summary in-app notification to the client.
+- **"Decline all"** with required reason — cascades `cancellation_reason` / `cancelled_by` / `cancelled_at` across every booking and sends one decline notification to the client.
+- Individual rows also show a subtle "recurring" pill next to the service name so admin can spot them at a glance in the main table.
+- Both bulk actions log single-line audit entries (`bookings_bulk_approved` / `bookings_bulk_rejected`) for traceability.
