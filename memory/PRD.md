@@ -211,3 +211,12 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 ## Critical Deployment Notes
 - `/app/frontend/public/styles.css` is the production CSS fallback. After any new Tailwind classes are introduced, rebuild (`yarn build`) and copy `.next/static/chunks/*.css` → `public/styles.css`.
 - Admin creation route requires `SUPABASE_SERVICE_ROLE_KEY` (already in `/app/frontend/.env`).
+
+### Feb 2026 (Fork — Omnibus Notifications Fix)
+- Resolved broken Next.js build by adding role-specific notification routes:
+  `/admin/notifications`, `/walker/notifications`, `/client/notifications` — all wired to shared `components/shared/NotificationsPageInner.tsx`.
+- Fixed schema inconsistency: shared notifications page now uses `is_read` (matching `NotificationBell` + `lib/notify.ts`).
+- `yarn build` green — all 50 routes compile; supervisor now boots frontend cleanly.
+- Expanded `supabase/migrations/20260426_omnibus.sql` to also create `notifications` + `notification_prefs` tables (with RLS + indexes) so it is fully self-contained for user paste.
+- Edge Functions `user-erase` (GDPR Art. 17) and `storage-cleanup` (monthly bucket orphan sweep) delivered for user to paste into Supabase Dashboard.
+

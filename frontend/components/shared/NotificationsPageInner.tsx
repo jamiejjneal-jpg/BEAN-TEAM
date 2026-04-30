@@ -40,14 +40,14 @@ export function NotificationsPageInner() {
     setLoading(false)
   }
   async function markAllRead() {
-    await supabase.from('notifications').update({ read: true }).eq('user_id', user!.id).eq('read', false)
+    await supabase.from('notifications').update({ is_read: true }).eq('user_id', user!.id).eq('is_read', false)
     toast.success('All marked as read'); fetchAll()
   }
-  async function markRead(id: string) { await supabase.from('notifications').update({ read: true }).eq('id', id); fetchAll() }
+  async function markRead(id: string) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); fetchAll() }
   async function del(id: string) { await supabase.from('notifications').delete().eq('id', id); fetchAll() }
 
-  const filtered = filter === 'unread' ? notifs.filter(n => !n.read) : notifs
-  const unreadCount = notifs.filter(n => !n.read).length
+  const filtered = filter === 'unread' ? notifs.filter(n => !n.is_read) : notifs
+  const unreadCount = notifs.filter(n => !n.is_read).length
 
   return (
     <div className="space-y-5" data-testid="notifications-page">
@@ -83,23 +83,23 @@ export function NotificationsPageInner() {
           {filtered.map(n => {
             const Icon = iconByType[n.type] || Bell
             return (
-              <Card key={n.id} className={`hover:shadow-sm transition ${!n.read ? 'bg-[#E8F0EC]/30 border-[#1A4331]/20' : ''}`} data-testid={`notification-${n.id}`}>
+              <Card key={n.id} className={`hover:shadow-sm transition ${!n.is_read ? 'bg-[#E8F0EC]/30 border-[#1A4331]/20' : ''}`} data-testid={`notification-${n.id}`}>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className={`h-8 w-8 rounded-lg shrink-0 flex items-center justify-center ${!n.read ? 'bg-[#1A4331] text-white' : 'bg-[#F2F0EB] text-[#5C5C5C]'}`}>
+                    <div className={`h-8 w-8 rounded-lg shrink-0 flex items-center justify-center ${!n.is_read ? 'bg-[#1A4331] text-white' : 'bg-[#F2F0EB] text-[#5C5C5C]'}`}>
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <p className="text-sm font-medium">{n.title}</p>
                         <div className="flex items-center gap-1.5 shrink-0">
-                          {!n.read && <Badge variant="default" className="text-[9px]">new</Badge>}
+                          {!n.is_read && <Badge variant="default" className="text-[9px]">new</Badge>}
                           <p className="text-[10px] text-[#9C8E7A] whitespace-nowrap">{formatAgo(n.created_at)}</p>
                         </div>
                       </div>
                       <p className="text-sm text-[#5C5C5C] mt-0.5">{n.message}</p>
                       <div className="flex gap-2 mt-2">
-                        {!n.read && <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => markRead(n.id)}>Mark read</Button>}
+                        {!n.is_read && <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => markRead(n.id)}>Mark read</Button>}
                         <Button variant="ghost" size="sm" className="h-7 text-xs text-[#E06D53]" onClick={() => del(n.id)} data-testid={`delete-${n.id}`}>
                           <Trash2 className="h-3 w-3 mr-1" /> Delete
                         </Button>

@@ -1,8 +1,68 @@
 -- ============================================================
 -- Omnibus enhancement migration
--- Covers: cancellation reasons, DBS/insurance, walker unavailability,
--- recurring bookings, NPS surveys.
+-- Covers: in-app notifications + prefs, cancellation reasons,
+-- DBS/insurance, walker unavailability, recurring bookings, NPS.
+-- Idempotent — safe to re-run.
 -- ============================================================
+
+-- 0) In-app notifications + per-user prefs -------------------
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id            uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  title              text NOT NULL,
+  message            text NOT NULL,
+  type               text NOT NULL DEFAULT 'system',
+  related_booking_id uuid REFERENCES public.bookings(id) ON DELETE SET NULL,
+  is_read            boolean NOT NULL DEFAULT false,
+  emailed_at         timestamptz,
+  created_at         timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON public.notifications(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_unread ON public.notifications(user_id, is_read) WHERE is_read = false;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users read own notifications" ON public.notifications;
+CREATE POLICY "Users read own notifications"
+  ON public.notifications FOR SELECT
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users update own notifications" ON public.notifications;
+CREATE POLICY "Users update own notifications"
+  ON public.notifications FOR UPDATE
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users delete own notifications" ON public.notifications;
+CREATE POLICY "Users delete own notifications"
+  ON public.notifications FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- Any authenticated row can insert for another user (system emits these).
+DROP POLICY IF EXISTS "Authed insert notifications" ON public.notifications;
+CREATE POLICY "Authed insert notifications"
+  ON public.notifications FOR INSERT
+  WITH CHECK (auth.uid() IS NOT NULL);
+
+CREATE TABLE IF NOT EXISTS public.notification_prefs (
+  user_id            uuid PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
+  inapp_booking      boolean NOT NULL DEFAULT true,
+  inapp_walk_update  boolean NOT NULL DEFAULT true,
+  inapp_photo_added  boolean NOT NULL DEFAULT true,
+  inapp_review       boolean NOT NULL DEFAULT true,
+  inapp_system       boolean NOT NULL DEFAULT true,
+  email_booking      boolean NOT NULL DEFAULT true,
+  email_walk_update  boolean NOT NULL DEFAULT false,
+  email_photo_added  boolean NOT NULL DEFAULT false,
+  email_review       boolean NOT NULL DEFAULT false,
+  email_system       boolean NOT NULL DEFAULT true,
+  digest_mode        text   NOT NULL DEFAULT 'instant' CHECK (digest_mode IN ('instant','daily','weekly')),
+  paused_until       timestamptz,
+  updated_at         timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE public.notification_prefs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own prefs" ON public.notification_prefs;
+CREATE POLICY "Users manage own prefs"
+  ON public.notification_prefs FOR ALL
+  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- 1) Cancellation reasons -------------------------------------
 ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS cancellation_reason text;
