@@ -113,3 +113,97 @@ export function expandTemplateOccurrences(opts: {
   }
   return out
 }
+
+/**
+ * After a walker marks a booking 'completed', auto-extend the linked
+ * recurring template's horizon if fewer than `MIN_WEEKS_AHEAD` weeks
+ * of pending/confirmed occurrences remain. Best-effort: silent no-op
+ * on any error so it never interferes with the walk-completion UX.
+ *
+ * Returns how many new bookings were created (0 if nothing to do).
+ */
+export async function autoExtendIfLow(booking: {
+  id: string
+  recurring_template_id: string | null
+}): Promise<number> {
+  if (!booking.recurring_template_id) return 0
+  const supabase = createClient()
+  const MIN_WEEKS_AHEAD = 2
+  const EXTEND_WEEKS = 4
+  const today = new Date().toISOString().slice(0, 10)
+
+  try {
+    // Load the template
+    const { data: tpl } = await supabase
+      .from('recurring_bookings')
+      .select('id, client_id, dog_id, walker_id, walk_type, days_of_week, scheduled_time, duration_minutes, pickup_address, notes, end_date, is_active')
+      .eq('id', booking.recurring_template_id)
+      .maybeSingle()
+    if (!tpl || !(tpl as any).is_active) return 0
+
+    // Count / find last existing occurrence
+    const { data: existing } = await supabase
+      .from('bookings')
+      .select('scheduled_date')
+      .eq('recurring_template_id', booking.recurring_template_id)
+      .gte('scheduled_date', today)
+      .in('status', ['pending', 'confirmed'])
+      .order('scheduled_date', { ascending: false })
+
+    const daysPerWeek = Math.max(1, ((tpl as any).days_of_week || []).length)
+    const minOccurrencesNeeded = MIN_WEEKS_AHEAD * daysPerWeek
+    if ((existing?.length ?? 0) >= minOccurrencesNeeded) return 0 // horizon healthy
+
+    const lastDate = existing?.[0]?.scheduled_date as string | undefined
+    const startFromIso = lastDate
+      ? new Date(new Date(lastDate + 'T00:00:00').getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+      : today
+
+    const occurrences = expandTemplateOccurrences({
+      start_date: startFromIso,
+      end_date: (tpl as any).end_date || null,
+      days_of_week: (tpl as any).days_of_week,
+      weeks_ahead: EXTEND_WEEKS,
+    })
+    if (occurrences.length === 0) return 0
+
+    const rows = occurrences.map(d => ({
+      client_id: (tpl as any).client_id,
+      dog_id:    (tpl as any).dog_id,
+      walker_id: (tpl as any).walker_id,
+      scheduled_date: d,
+      scheduled_time: (tpl as any).scheduled_time,
+      walk_type: (tpl as any).walk_type,
+      duration_minutes: (tpl as any).duration_minutes || 30,
+      notes: (tpl as any).notes,
+      pickup_address: (tpl as any).pickup_address,
+      status: 'pending',
+      recurring_template_id: (tpl as any).id,
+    }))
+    const { error } = await supabase.from('bookings').insert(rows)
+    if (error) return 0
+
+    // Ping client + admins so they know the horizon refreshed
+    await supabase.from('notifications').insert([{
+      user_id: (tpl as any).client_id,
+      title: 'Regular walks rolled forward',
+      message: `We've added the next ${occurrences.length} walks to your schedule — admin will approve them shortly.`,
+      type: 'booking',
+      is_read: false,
+    }])
+    const { data: admins } = await supabase
+      .from('profiles').select('id').eq('role', 'admin').eq('is_active', true)
+    if (admins && admins.length > 0) {
+      await supabase.from('notifications').insert(admins.map((a: any) => ({
+        user_id: a.id,
+        title: 'Recurring walks auto-extended',
+        message: `${occurrences.length} new pending walks added to a client's recurring schedule — ready for bulk approve.`,
+        type: 'booking',
+        is_read: false,
+      })))
+    }
+    return occurrences.length
+  } catch {
+    return 0
+  }
+}

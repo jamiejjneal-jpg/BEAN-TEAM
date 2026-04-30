@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { formatDate, formatTime, BOOKING_STATUSES } from '@/lib/utils'
 import { toast } from 'sonner'
 import { notify } from '@/lib/notify'
+import { autoExtendIfLow } from '@/lib/availability'
 import { MapPin, CheckCircle, Navigation, Home, Camera, Image as ImageIcon, Loader2, X } from 'lucide-react'
 
 export default function WalkerWalks() {
@@ -65,6 +66,15 @@ export default function WalkerWalks() {
         status: 'completed',
         actual_end_time: new Date().toISOString(),
       }).eq('id', bookingId)
+
+      // Auto-extend recurring horizon if it's running low
+      const just = walks.find(w => w.id === bookingId)
+      if (just?.recurring_template_id) {
+        const added = await autoExtendIfLow({ id: bookingId, recurring_template_id: just.recurring_template_id })
+        if (added > 0) {
+          toast.success(`Walk complete! We've auto-booked the next ${added} walks for this client.`)
+        }
+      }
     }
 
     toast.success(`${eventType.replace('_', ' ')} logged! Client has been notified.`)

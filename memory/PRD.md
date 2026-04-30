@@ -254,3 +254,9 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - **"Decline all"** with required reason — cascades `cancellation_reason` / `cancelled_by` / `cancelled_at` across every booking and sends one decline notification to the client.
 - Individual rows also show a subtle "recurring" pill next to the service name so admin can spot them at a glance in the main table.
 - Both bulk actions log single-line audit entries (`bookings_bulk_approved` / `bookings_bulk_rejected`) for traceability.
+
+
+### Feb 2026 (Fork — Auto-rebook on walk completion)
+- **`autoExtendIfLow(booking)` helper** in `lib/availability.ts` — checks how many future pending/confirmed occurrences remain for the booking's recurring template; if fewer than 2 weeks' worth, auto-creates the next 4 weeks of bookings.
+- **Walker walk completion hook** — on `Walk Complete` / `Drop off` in `/walker/walks`, if the booking belongs to a recurring template the horizon is auto-refreshed and both the client and all admins get an "auto-extended" in-app notification. Silent no-op when the template is paused, cap-ended, or already healthy.
+- Zero admin/client taps required — pairs with the earlier bulk-approve banner so new auto-extended batches surface as a single "Approve all N" row.
