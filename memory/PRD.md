@@ -268,3 +268,13 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - **Analytics Excel export** — `/admin/analytics` now has an "Export to Excel" button producing a 5-sheet `.xlsx` (Summary KPIs, By Service, Monthly Trend, Walkers, Day of Week).
 - **Services CMS** — new migration `20260430_site_services.sql` creates a `site_services` table seeded from the hard-coded WALK_TYPES. New admin page `/admin/services` lets admins add/edit/reorder/price services, toggle bookable/pricing visibility. `/client/book` and `/pricing` now pull from this table (fallback to static list if DB empty).
 - **Workload heatmap** — new `WorkloadHeatmap` component above the admin calendar showing walker × day booking counts as a green-intensity grid.
+
+
+### Feb 2026 (Fork — Soft cap + Phase 2 Site Setup CMS)
+- **Walker soft cap on admin bookings** — `/admin/bookings` now shows each walker's load vs. their `max_dogs` cap for the selected booking date. 🛑 = at/over, ⚠️ = near. Non-blocking — admin can still override.
+- **Phase 2: Site Setup CMS live** — `/admin/site-setup` (replaces `/admin/site-images`, which is now a redirect). Unified page with tabs per area (Global / Landing / Pricing / Auth) containing editable text + images.
+- **New SQL**: `20260430_site_texts.sql` — tiny `site_texts` key/value table with public read + admin write RLS.
+- **Reusable `<SiteText>` component** with module-level cache.
+- **22 text slots** in `lib/site-texts.ts` across Global / Landing / Pricing / Auth.
+- **Editable site logo** — new `site_logo` slot added to `SITE_IMAGE_SLOTS`.
+- **Landing rewired** — hero, **new "Meet Rocky" section**, bottom CTA now read from `site_texts`. Pricing hero + bottom CTA likewise.

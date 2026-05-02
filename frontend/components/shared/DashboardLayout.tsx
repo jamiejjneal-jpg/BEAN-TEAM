@@ -30,7 +30,7 @@ const navItems = {
     { href: '/admin/email', label: 'Email Center', icon: Mail },
     { href: '/admin/gallery', label: 'Gallery', icon: Camera },
     { href: '/admin/team', label: 'Team', icon: Shield },
-    { href: '/admin/site-images', label: 'Site Images', icon: ImageIcon },
+    { href: '/admin/site-setup', label: 'Site Setup', icon: ImageIcon },
     { href: '/admin/audit', label: 'Audit Log', icon: History },
     { href: '/admin/health', label: 'Health', icon: Activity },
     { href: '/settings/notifications', label: 'Notifications', icon: Bell },

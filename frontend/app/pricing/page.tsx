@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PawPrint, Check, Clock, Home, Moon, House, Dog, ArrowRight, PawPrint as PawPrintIcon, Plus } from 'lucide-react'
 import { SiteImage } from '@/components/shared/SiteImage'
+import { SiteText } from '@/components/shared/SiteText'
 import { ExtraServicesSection } from '@/components/shared/ExtraServicesSection'
 
 type Tier = { label: string; price: string; sub?: string }
@@ -84,14 +85,10 @@ export default function PricingPage() {
         <div className="grid lg:grid-cols-[1fr_auto] gap-10 lg:gap-16 items-center">
           <div>
             <div className="inline-flex items-center gap-2 bg-[#DDA74F]/15 text-[#8A6A2A] rounded-full px-3 py-1 text-xs font-medium mb-4">
-              2026 prices
+              <SiteText textKey="pricing_hero_eyebrow" />
             </div>
-            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#1A1A1A] leading-[1.05] mb-4">
-              Simple, honest<br/>pricing.
-            </h1>
-            <p className="text-[#5C5C5C] text-base sm:text-lg max-w-md leading-relaxed">
-              Whether your dog needs a stroll or a sleepover, every package includes the same love and attention Rocky gets. No subscriptions, no hidden fees.
-            </p>
+            <SiteText textKey="pricing_hero_headline" as="h1" className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#1A1A1A] leading-[1.05] mb-4" />
+            <SiteText textKey="pricing_hero_body" as="p" className="text-[#5C5C5C] text-base sm:text-lg max-w-md leading-relaxed" />
           </div>
           <div className="relative w-56 h-56 sm:w-72 sm:h-72 rounded-full overflow-hidden shadow-xl border-4 border-white ring-4 ring-[#DDA74F]/30 mx-auto lg:mx-0">
             <SiteImage imageKey="pricing_portrait" variant={{ kind: 'fill' }} className="object-cover" />
@@ -175,8 +172,8 @@ export default function PricingPage() {
       {/* CTA */}
       <section className="py-16 lg:py-20 bg-[#1A4331]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-white mb-3">Ready to book?</h2>
-          <p className="text-white/80 mb-8 max-w-xl mx-auto">Create an account, tell us about your dog, and we&apos;ll take care of the rest.</p>
+          <SiteText textKey="pricing_cta_heading" as="h2" className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-white mb-3" />
+          <SiteText textKey="pricing_cta_body" as="p" className="text-white/80 mb-8 max-w-xl mx-auto" />
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link href="/register" className="inline-flex items-center gap-2 bg-white text-[#1A4331] hover:bg-[#F9F8F6] rounded-lg px-7 py-3 text-sm font-medium transition-colors">
               Get Started <ArrowRight className="h-4 w-4" />

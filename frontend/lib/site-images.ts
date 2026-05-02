@@ -5,6 +5,7 @@ export type SiteImageKey =
   | 'pricing_portrait'
   | 'login_bg'
   | 'register_bg'
+  | 'site_logo'
 
 export type SiteImageSlot = {
   key: SiteImageKey
@@ -16,6 +17,14 @@ export type SiteImageSlot = {
 }
 
 export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
+  {
+    key: 'site_logo',
+    label: 'Site logo',
+    description: 'Shown in the site header, emails and printable invoices. Use a transparent PNG or SVG, square/round-friendly.',
+    aspect: 'aspect-square',
+    defaultUrl: '',
+    defaultAlt: "Rocky's Retreat and Rambles logo",
+  },
   {
     key: 'landing_hero',
     label: 'Landing — Hero',

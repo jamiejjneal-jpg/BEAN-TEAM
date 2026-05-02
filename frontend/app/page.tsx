@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PawPrint, Shield, Clock, MapPin, Star, Users, ArrowRight, CheckCircle } from 'lucide-react'
 import { SiteImage } from '@/components/shared/SiteImage'
+import { SiteText } from '@/components/shared/SiteText'
 
 export default function LandingPage() {
   return (
@@ -31,20 +32,16 @@ export default function LandingPage() {
             <div className="animate-fade-in">
               <div className="inline-flex items-center gap-2 bg-[#E8F0EC] rounded-full px-4 py-1.5 mb-6">
                 <span className="h-2 w-2 rounded-full bg-[#2D7A5D] animate-pulse" />
-                <span className="text-xs font-medium text-[#1A4331] tracking-wide">Trusted by hundreds of pet owners</span>
+                <SiteText textKey="landing_hero_eyebrow" as="span" className="text-xs font-medium text-[#1A4331] tracking-wide" />
               </div>
-              <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-none text-[#1A1A1A] mb-6">
-                Your dog deserves the <span className="text-[#1A4331]">best walks</span>
-              </h1>
-              <p className="text-lg text-[#5C5C5C] leading-relaxed mb-8 max-w-lg">
-                Connect with professional, vetted dog walkers in your area. Real-time updates, reliable scheduling, and happy tails guaranteed.
-              </p>
+              <SiteText textKey="landing_hero_headline" as="h1" className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-none text-[#1A1A1A] mb-6" />
+              <SiteText textKey="landing_hero_subheadline" as="p" className="text-lg text-[#5C5C5C] leading-relaxed mb-8 max-w-lg" />
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link href="/register" data-testid="hero-cta" className="inline-flex items-center justify-center gap-2 bg-[#1A4331] text-white hover:bg-[#265C45] rounded-lg px-8 py-3 text-sm font-medium transition-colors">
-                  Book a Walk <ArrowRight className="h-4 w-4" />
+                  <SiteText textKey="landing_hero_cta_primary" /> <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link href="/register?role=walker" data-testid="hero-walker-cta" className="inline-flex items-center justify-center gap-2 border border-[#1A4331] text-[#1A4331] hover:bg-[#E8F0EC] rounded-lg px-8 py-3 text-sm font-medium transition-colors">
-                  Become a Walker
+                <Link href="/pricing" data-testid="hero-walker-cta" className="inline-flex items-center justify-center gap-2 border border-[#1A4331] text-[#1A4331] hover:bg-[#E8F0EC] rounded-lg px-8 py-3 text-sm font-medium transition-colors">
+                  <SiteText textKey="landing_hero_cta_secondary" />
                 </Link>
               </div>
             </div>
@@ -120,6 +117,27 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="py-16 lg:py-24 bg-white border-y border-[#E5E3DB]" data-testid="meet-rocky-section">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-[auto_1fr] gap-8 md:gap-12 items-center">
+            <div className="relative w-48 h-48 sm:w-56 sm:h-56 mx-auto md:mx-0 rounded-full overflow-hidden ring-4 ring-[#E8F0EC] shadow-xl">
+              <SiteImage imageKey="pricing_portrait" variant={{ kind: 'fill' }} className="object-cover" />
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-2 bg-[#E8F0EC] text-[#1A4331] rounded-full px-3 py-1 text-xs font-medium mb-3">
+                <PawPrint className="h-3 w-3" /> The team
+              </div>
+              <SiteText textKey="landing_meet_rocky_heading" as="h2" className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-[#1A1A1A] mb-3" />
+              <SiteText textKey="landing_meet_rocky_body" as="p" className="text-[#5C5C5C] leading-relaxed mb-4" />
+              <p className="text-sm italic text-[#1A4331] flex items-center gap-2">
+                <Star className="h-4 w-4 text-[#DDA74F] fill-[#DDA74F]" />
+                <SiteText textKey="landing_meet_rocky_fact" />
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 lg:py-20 bg-[#FDF8EF] border-y border-[#DDA74F]/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-[#DDA74F]/15 text-[#8A6A2A] rounded-full px-3 py-1 text-xs font-medium mb-4">
@@ -135,12 +153,8 @@ export default function LandingPage() {
 
       <section className="py-20 lg:py-32 bg-[#1A4331]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-            Ready to get started?
-          </h2>
-          <p className="text-[#8EA396] mb-8 max-w-lg mx-auto">
-            Join Rocky&apos;s Retreat and Rambles today and give your dog the exercise and companionship they deserve.
-          </p>
+          <SiteText textKey="landing_cta_heading" as="h2" className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4" />
+          <SiteText textKey="landing_cta_body" as="p" className="text-[#8EA396] mb-8 max-w-lg mx-auto" />
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/register" className="inline-flex items-center justify-center gap-2 bg-white text-[#1A4331] hover:bg-[#E8F0EC] rounded-lg px-8 py-3 text-sm font-medium transition-colors">
               Sign Up as Client <ArrowRight className="h-4 w-4" />

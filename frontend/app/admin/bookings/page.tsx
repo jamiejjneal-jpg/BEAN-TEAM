@@ -41,12 +41,32 @@ export default function AdminBookings() {
 
   const supabase = createClient()
 
+  // Build a walker_id -> date -> count map for active bookings so we can soft-cap
+  const walkerLoadByDate = (() => {
+    const map = new Map<string, Map<string, number>>()
+    for (const b of bookings) {
+      if (!b.walker_id) continue
+      if (!['pending', 'confirmed', 'in_progress'].includes(b.status)) continue
+      const perDay = map.get(b.walker_id) || new Map<string, number>()
+      perDay.set(b.scheduled_date, (perDay.get(b.scheduled_date) || 0) + 1)
+      map.set(b.walker_id, perDay)
+    }
+    return map
+  })()
+
+  function walkerLoad(walkerId: string, date?: string | null): { count: number; cap: number; over: boolean; near: boolean } {
+    const cap = Math.max(1, Number(walkers.find((w: any) => w.id === walkerId)?.walker_profiles?.max_dogs) || 3)
+    if (!date) return { count: 0, cap, over: false, near: false }
+    const count = walkerLoadByDate.get(walkerId)?.get(date) || 0
+    return { count, cap, over: count >= cap, near: count >= cap - 1 && count < cap }
+  }
+
   useEffect(() => { fetchData() }, [])
 
   async function fetchData() {
     const [bookingsRes, walkersRes, clientsRes, dogsRes] = await Promise.all([
       supabase.from('bookings').select('*, client:profiles!bookings_client_id_fkey(full_name, email), walker:profiles!bookings_walker_id_fkey(full_name), dog:dogs(name, breed), recurring_template:recurring_bookings(id, walker_id, days_of_week, scheduled_time, walk_type)').order('scheduled_date', { ascending: false }),
-      supabase.from('profiles').select('id, full_name').eq('role', 'walker').eq('is_active', true),
+      supabase.from('profiles').select('id, full_name, walker_profiles(max_dogs)').eq('role', 'walker').eq('is_active', true),
       supabase.from('profiles').select('id, full_name, email, address').eq('role', 'client').eq('is_active', true).order('full_name'),
       supabase.from('dogs').select('id, name, breed, owner_id').eq('is_active', true),
     ])
@@ -436,17 +456,41 @@ export default function AdminBookings() {
               </div>
 
               <div className="space-y-2">
-                <Label>Assign Walker</Label>
+                <Label className="flex items-center justify-between">
+                  <span>Assign Walker</span>
+                  {assignWalker && selected?.scheduled_date && (() => {
+                    const load = walkerLoad(assignWalker, selected.scheduled_date)
+                    return (
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${load.over ? 'bg-[#FDEDEA] text-[#E06D53]' : load.near ? 'bg-[#FDF8EF] text-[#DDA74F]' : 'bg-[#E8F0EC] text-[#1A4331]'}`}>
+                        {load.count}/{load.cap} booked on {selected.scheduled_date}
+                      </span>
+                    )
+                  })()}
+                </Label>
                 <Select value={assignWalker} onValueChange={setAssignWalker}>
                   <SelectTrigger data-testid="assign-walker-select">
                     <SelectValue placeholder="Select walker" />
                   </SelectTrigger>
                   <SelectContent>
-                    {walkers.map((w) => (
-                      <SelectItem key={w.id} value={w.id}>{w.full_name}</SelectItem>
-                    ))}
+                    {walkers.map((w: any) => {
+                      const load = walkerLoad(w.id, selected?.scheduled_date || null)
+                      return (
+                        <SelectItem key={w.id} value={w.id} data-testid={`assign-option-${w.id}${load.over ? '-full' : ''}`}>
+                          <span className="flex items-center gap-2">
+                            {load.over && <span aria-label="At capacity" title="At capacity — overbook risk">🛑</span>}
+                            {load.near && !load.over && <span aria-label="Near capacity" title="Near capacity">⚠️</span>}
+                            <span>{w.full_name}{selected?.scheduled_date ? ` — ${load.count}/${load.cap}` : ''}</span>
+                          </span>
+                        </SelectItem>
+                      )
+                    })}
                   </SelectContent>
                 </Select>
+                {assignWalker && selected?.scheduled_date && walkerLoad(assignWalker, selected.scheduled_date).over && (
+                  <p className="text-xs text-[#E06D53]" data-testid="capacity-warning">
+                    ⚠ This walker is at their max_dogs capacity for {selected.scheduled_date}. You can still assign, but consider redistributing.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -531,9 +575,25 @@ export default function AdminBookings() {
                   <SelectTrigger data-testid="add-booking-walker"><SelectValue placeholder="Leave pending" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="__none">Leave pending (I&apos;ll assign later)</SelectItem>
-                    {walkers.map(w => <SelectItem key={w.id} value={w.id}>{w.full_name}</SelectItem>)}
+                    {walkers.map((w: any) => {
+                      const load = walkerLoad(w.id, newBk.scheduled_date || null)
+                      return (
+                        <SelectItem key={w.id} value={w.id}>
+                          <span className="flex items-center gap-2">
+                            {load.over && <span title="At capacity">🛑</span>}
+                            {load.near && !load.over && <span title="Near capacity">⚠️</span>}
+                            <span>{w.full_name}{newBk.scheduled_date ? ` — ${load.count}/${load.cap}` : ''}</span>
+                          </span>
+                        </SelectItem>
+                      )
+                    })}
                   </SelectContent>
                 </Select>
+                {newBk.walker_id && newBk.scheduled_date && walkerLoad(newBk.walker_id, newBk.scheduled_date).over && (
+                  <p className="text-xs text-[#E06D53]">
+                    ⚠ Walker is at capacity for this date.
+                  </p>
+                )}
               </div>
             </div>
             {!newBk.client_id && !newBk.walker_id && (
