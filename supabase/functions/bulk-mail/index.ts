@@ -1,15 +1,5 @@
 // Supabase Edge Function: bulk-mail
-// Admin-only. Sends a single email to many recipients (clients and/or walkers)
-// via Resend. Each recipient gets their own personalised email, not a BCC
-// batch — so replies route correctly and names/contact fields render cleanly.
-//
-// Client invokes via:
-//   supabase.functions.invoke('bulk-mail', {
-//     body: { subject, html, recipients: [{ email, full_name }], audit_name? }
-//   })
-//
-// Secrets (same as notify): RESEND_API_KEY, SENDER_EMAIL, APP_URL
-// Supabase auto-provides: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+// Admin-only. Sends personalised email via Resend with optional PDF attachments.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
@@ -30,10 +20,10 @@ function wrap(subject: string, bodyHtml: string): string {
   return `<!doctype html><html><body style="margin:0;padding:0;background:#F9F8F6;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A;">
 <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;"><tr><td align="center">
 <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;border:1px solid #E5E3DB;overflow:hidden;">
-<tr><td style="background:#1A4331;padding:20px 32px;color:#fff;font-size:18px;font-weight:700;">🐾 Rocky's Retreat and Rambles</td></tr>
+<tr><td style="background:#1A4331;padding:20px 32px;color:#fff;font-size:18px;font-weight:700;">Rocky's Retreat and Rambles</td></tr>
 <tr><td style="padding:28px 32px 8px;"><h1 style="margin:0 0 12px;font-size:20px;color:#1A4331;">${subject}</h1></td></tr>
 <tr><td style="padding:0 32px 24px;font-size:15px;line-height:1.6;color:#3C3C3C;">${bodyHtml}</td></tr>
-<tr><td style="padding:16px 32px 24px;font-size:12px;color:#8A8A8A;border-top:1px solid #E5E3DB;">Rocky's Retreat and Rambles · Please reply to this email if you have any questions.</td></tr>
+<tr><td style="padding:16px 32px 24px;font-size:12px;color:#8A8A8A;border-top:1px solid #E5E3DB;">Rocky's Retreat and Rambles. Please reply to this email if you have any questions.</td></tr>
 </table></td></tr></table></body></html>`
 }
 
@@ -44,8 +34,6 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get("Authorization") || ""
   if (!authHeader.startsWith("Bearer ")) return json({ error: "Missing Authorization" }, { status: 401 })
 
-  // Authenticate caller — all invocations need a valid JWT. We'll decide
-  // below whether they additionally need to be admin.
   const userClient = createClient(SUPABASE_URL, SERVICE_ROLE, { global: { headers: { Authorization: authHeader } } })
   const { data: { user }, error: userErr } = await userClient.auth.getUser()
   if (userErr || !user) return json({ error: "Unauthorized" }, { status: 401 })
@@ -53,41 +41,32 @@ Deno.serve(async (req) => {
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { autoRefreshToken: false, persistSession: false } })
   const { data: me } = await admin.from("profiles").select("role, full_name, email").eq("id", user.id).maybeSingle()
 
-  // deno-lint-ignore no-explicit-any
   let body: any
   try { body = await req.json() } catch { return json({ error: "Invalid JSON" }, { status: 400 }) }
 
   const { subject, html, recipients, audit_name, auto_template_key, attachments } = body as {
-    subject?: string; html?: string; audit_name?: string; auto_template_key?: string
+    subject?: string
+    html?: string
+    audit_name?: string
+    auto_template_key?: string
     recipients?: { email?: string; full_name?: string }[]
     attachments?: { filename: string; content: string; contentType?: string }[]
   }
 
-  // Access rules:
-  //   • auto_template_key flows (welcome_client etc.) — any authenticated user
-  //     can trigger, BUT they may only send to a single recipient and only
-  //     to themselves (own email). Prevents abuse as a spam relay.
-  //   • Bulk sends with custom subject/html — admin-only.
   const isAutomation = !!auto_template_key
   if (!isAutomation && me?.role !== "admin") {
-    return json({ error: "Forbidden — admin only" }, { status: 403 })
+    return json({ error: "Forbidden: admin only" }, { status: 403 })
   }
   if (isAutomation) {
-    // Lock the automation path down hard.
     if (!Array.isArray(recipients) || recipients.length !== 1) {
       return json({ error: "Automation calls must target exactly one recipient" }, { status: 400 })
     }
     const to = (recipients[0]?.email || "").toLowerCase()
-    // Must match the caller's own email (or an admin is allowed to send for others).
     if (me?.role !== "admin" && to !== (user.email || "").toLowerCase()) {
       return json({ error: "Automation calls can only send to your own email" }, { status: 403 })
     }
   }
 
-  // ---- Automation path: caller just passes a template key + recipient. -----
-  // Lets the triggerAutoEmail frontend helper work without exposing the
-  // email_automations table to non-admin users. We look up the toggle with
-  // the service role and use any admin-saved overrides.
   let effSubject = subject
   let effHtml    = html
   let effAuditName = audit_name
@@ -111,7 +90,6 @@ Deno.serve(async (req) => {
 
   let sent = 0, failed = 0
   const failures: string[] = []
-  // Simple sequential send — small audiences. Avoids Resend rate-limits.
   for (const r of valid) {
     const greeting = r.full_name ? `<p>Hi ${r.full_name.split(" ")[0]},</p>` : ""
     const wrapped = wrap(effSubject!, `${greeting}${effHtml!}`)
@@ -120,8 +98,8 @@ Deno.serve(async (req) => {
       if (attachments && attachments.length > 0) {
         payload.attachments = attachments.map(a => ({
           filename: a.filename,
-          content: a.content,  // base64
-          content_type: a.contentType || 'application/octet-stream',
+          content: a.content,
+          content_type: a.contentType || "application/octet-stream",
         }))
       }
       const res = await fetch("https://api.resend.com/emails", {
@@ -136,7 +114,6 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Audit log — paper trail of every bulk send
   try {
     await admin.from("audit_log").insert({
       actor_id: user.id,
@@ -148,7 +125,7 @@ Deno.serve(async (req) => {
       target_name: effAuditName || effSubject,
       details: { subject: effSubject, recipients_count: valid.length, sent, failed, failures: failures.slice(0, 10) },
     })
-  } catch (e) { console.warn("[bulk-mail] audit failed:", e) }
+  } catch (e) { console.warn("bulk-mail audit failed:", e) }
 
   return json({ ok: true, sent, failed, total: valid.length, failures })
 })
