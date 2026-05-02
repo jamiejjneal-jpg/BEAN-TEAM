@@ -1,0 +1,111 @@
+{
+  "summary": "Full regression testing completed. CRITICAL BLOCKER: Supabase RLS policy infinite recursion on 'profiles' table causing 500 errors on every authenticated request. Login works but session is unstable. Public pages (/, /pricing, /privacy, /terms) work correctly. Admin pages load but with constant 500 errors in background.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "Supabase profiles table RLS",
+        "issue": "INFINITE RECURSION: Policy 'Admins can manage all profiles' in 20260430_admin_write_policies.sql queries profiles table to check admin role, but this policy IS ON profiles table - causes infinite recursion. Error: 'infinite recursion detected in policy for relation profiles'",
+        "priority": "CRITICAL",
+        "file": "/app/supabase/migrations/20260430_admin_write_policies.sql",
+        "line": "19-22",
+        "fix": "Use auth.jwt() -> 'user_metadata' -> 'role' instead of querying profiles table, OR use a security definer function to check admin role"
+      },
+      {
+        "endpoint": "site_services table",
+        "issue": "No services seeded - migration 20260430_site_services.sql may not have run or didn't seed default services",
+        "priority": "HIGH"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "Font loading",
+        "issue": "OTS parsing error for woff2 fonts - invalid sfntVersion. Fonts fail to decode but app still works"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Session persistence",
+        "issue": "Session frequently lost when navigating between pages due to RLS infinite recursion errors causing auth state issues",
+        "affected_selectors": []
+      },
+      {
+        "flow": "Legacy route redirect",
+        "issue": "Could not verify /admin/site-images -> /admin/site-setup redirect due to session loss",
+        "affected_selectors": []
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "All pages",
+        "issues": ["Footer with 'Jamie Neal' copyright visible and correct"]
+      }
+    ]
+  },
+  "test_report_links": ["/app/test_reports/iteration_4.json"],
+  "action_items": [
+    "CRITICAL: Fix RLS infinite recursion in 20260430_admin_write_policies.sql - the 'Admins can manage all profiles' policy queries profiles table which triggers the same policy. Replace with: USING (auth.uid() = id OR (SELECT role FROM auth.users WHERE id = auth.uid()) = 'admin') or use a SECURITY DEFINER function",
+    "Run site_services migration to seed default services",
+    "Verify site_texts migration has run",
+    "After RLS fix, retest P0 bug (off_lead toggle persistence)",
+    "After RLS fix, retest all admin CRUD operations"
+  ],
+  "critical_code_review_comments": [
+    "CRITICAL BUG: /app/supabase/migrations/20260430_admin_write_policies.sql lines 19-22 - RLS policy on profiles table queries profiles table causing infinite recursion",
+    "The policy pattern 'EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')' is used on the profiles table itself - this is the root cause",
+    "Same pattern on dogs and walker_profiles tables works fine because they don't query themselves",
+    "Services CMS shows 'No services yet' - migration may not have seeded defaults"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "30% (RLS infinite recursion blocking most operations)",
+    "frontend": "70% (Pages load but with errors, session unstable)"
+  },
+  "test_credentials": {
+    "admin": "monkey121212@hotmail.co.uk / TestDev123!"
+  },
+  "seed_data_creation": "None - could not create due to RLS errors",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "CRITICAL: Fix the RLS infinite recursion first. The policy 'Admins can manage all profiles' on profiles table queries profiles table to check admin role - this causes infinite recursion. After fixing, retest: (1) P0 off_lead toggle persistence, (2) Services CMS, (3) Site Setup CMS, (4) Invoices flow, (5) Time-off workflow, (6) Recurring walks. Public pages work fine.",
+  "rca_of_the_issue": {
+    "root_cause": "RLS policy infinite recursion in 20260430_admin_write_policies.sql. The policy 'Admins can manage all profiles' on public.profiles table uses 'EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')' which queries the same table the policy is protecting, causing infinite recursion.",
+    "reproduction_steps": [
+      "1. Login as admin (monkey121212@hotmail.co.uk / TestDev123!)",
+      "2. Navigate to any admin page",
+      "3. Open browser console",
+      "4. Observe: 'Profile fetch error: infinite recursion detected in policy for relation profiles'",
+      "5. Multiple 500 errors appear for every API call involving profiles"
+    ],
+    "evidence": [
+      "Console error: 'Profile fetch error: infinite recursion detected in policy for relation \"profiles\"'",
+      "HTTP 500 errors on every authenticated request",
+      "Session instability - user gets logged out when navigating between pages"
+    ],
+    "potential_causes": [
+      "RLS policy on profiles table queries profiles table to check admin role",
+      "Supabase evaluates the policy recursively without a base case"
+    ],
+    "mitigation": "Replace the profiles table policy with one that doesn't query profiles. Options: (1) Use auth.jwt() -> 'user_metadata' -> 'role', (2) Create a SECURITY DEFINER function to check admin role, (3) Use a different approach like checking auth.uid() = id for self-access and a separate admin check"
+  },
+  "features_tested": {
+    "landing_page": "PASS - Hero section visible, footer with Jamie Neal copyright",
+    "pricing_page": "PASS - Page loads correctly",
+    "privacy_page": "PASS - Page loads correctly",
+    "terms_page": "PASS - Page loads correctly",
+    "admin_login": "PARTIAL - Login succeeds but session unstable due to RLS errors",
+    "admin_dashboard": "PARTIAL - Loads but shows 0 for all counts due to RLS errors",
+    "admin_site_setup": "PARTIAL - Page loads, tabs work, but save operations may fail",
+    "admin_services": "FAIL - Shows 'No services yet' - migration not seeded",
+    "admin_bookings": "PARTIAL - Page loads, Add Booking dialog opens",
+    "admin_invoices": "PARTIAL - Page loads, KPIs visible, buttons present",
+    "admin_time_off": "PARTIAL - Page loads, tabs work",
+    "admin_pets": "BLOCKED - Could not test due to session loss",
+    "admin_walkers": "BLOCKED - Could not test due to session loss",
+    "admin_clients": "BLOCKED - Could not test due to session loss",
+    "legacy_route_redirect": "BLOCKED - Could not verify due to session loss",
+    "logout": "BLOCKED - Could not test due to session loss"
+  }
+}
