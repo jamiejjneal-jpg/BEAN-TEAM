@@ -116,7 +116,12 @@ export default function AdminClients() {
         emergency_contact: form.emergency_contact, emergency_phone: form.emergency_phone,
       }
       if (avatarUrl !== null) updatePayload.avatar_url = avatarUrl
-      await supabase.from('profiles').update(updatePayload).eq('id', editingId)
+      const { data: upd, error: updErr } = await supabase.from('profiles').update(updatePayload).eq('id', editingId).select('id')
+      if (updErr) { toast.error('Save failed: ' + updErr.message); return }
+      if (!upd || upd.length === 0) {
+        toast.error('Save blocked — run the admin-write-policies SQL migration (see chat).')
+        return
+      }
       logAudit({ action: 'client_updated', target_type: 'user', target_id: editingId, target_name: form.full_name || form.email })
       toast.success('Client updated')
     } else {

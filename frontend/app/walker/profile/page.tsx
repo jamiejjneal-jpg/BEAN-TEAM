@@ -87,13 +87,13 @@ export default function WalkerProfile() {
       if (uploaded) avatarUrl = uploaded
     }
 
-    await Promise.all([
+    const [profRes, wpRes] = await Promise.all([
       supabase.from('profiles').update({
         full_name: form.full_name,
         phone: form.phone,
         address: form.address,
         avatar_url: avatarUrl,
-      }).eq('id', user!.id),
+      }).eq('id', user!.id).select('id'),
       supabase.from('walker_profiles').update({
         bio: form.bio,
         experience_years: form.experience_years,
@@ -103,8 +103,18 @@ export default function WalkerProfile() {
         dbs_checked_date: form.dbs_checked_date || null,
         insurance_expires: form.insurance_expires || null,
         first_aid_trained: form.first_aid_trained,
-      }).eq('id', user!.id),
+      }).eq('id', user!.id).select('id'),
     ])
+    if (profRes.error || wpRes.error) {
+      setSaving(false)
+      toast.error('Save failed: ' + (profRes.error?.message || wpRes.error?.message))
+      return
+    }
+    if ((profRes.data?.length ?? 0) === 0 || (wpRes.data?.length ?? 0) === 0) {
+      setSaving(false)
+      toast.error('Save blocked — please refresh and sign in again.')
+      return
+    }
     await refreshProfile()
     setPhotoFile(null)
     setPhotoPreview(null)

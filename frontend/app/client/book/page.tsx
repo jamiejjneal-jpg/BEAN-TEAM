@@ -17,10 +17,12 @@ import { CalendarDays, Dog, CheckCircle, AlertCircle, ArrowRight, Construction }
 import { speciesConfig, type PetSpecies } from '@/lib/species'
 import Link from 'next/link'
 import { walkersUnavailableOn } from '@/lib/availability'
+import { useSiteServices, priceOfService } from '@/lib/useServices'
 
 export default function BookWalk() {
   const { user } = useAuth()
   const router = useRouter()
+  const { services } = useSiteServices({ clientBookableOnly: true })
   const [dogs, setDogs] = useState<any[]>([])
   const [allPets, setAllPets] = useState<any[]>([])
   const [profile, setProfile] = useState<any>(null)
@@ -70,7 +72,7 @@ export default function BookWalk() {
     if (!form.scheduled_date) { toast.error('Please select a date'); return }
 
     setSubmitting(true)
-    const walkType = WALK_TYPES.find(w => w.value === form.walk_type)
+    const walkType = services.find(w => w.value === form.walk_type) || { duration_minutes: 30 }
     const { data: inserted, error } = await supabase.from('bookings').insert({
       client_id: user!.id,
       dog_id: form.dog_id,
@@ -78,7 +80,7 @@ export default function BookWalk() {
       scheduled_date: form.scheduled_date,
       scheduled_time: form.scheduled_time,
       walk_type: form.walk_type,
-      duration_minutes: walkType?.duration || 30,
+      duration_minutes: walkType?.duration_minutes || 30,
       notes: form.notes,
       pickup_address: form.pickup_address,
       status: 'pending',
@@ -254,7 +256,11 @@ export default function BookWalk() {
                 <Select value={form.walk_type} onValueChange={(v) => setForm({ ...form, walk_type: v })}>
                   <SelectTrigger data-testid="select-walk-type"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {WALK_TYPES.filter(w => w.clientBookable).map(w => <SelectItem key={w.value} value={w.value}>{w.label}</SelectItem>)}
+                    {services.map(w => (
+                      <SelectItem key={w.value} value={w.value}>
+                        {w.label} — {w.price_label || `£${Number(w.price).toFixed(2)}`}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

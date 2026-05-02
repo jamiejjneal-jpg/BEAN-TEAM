@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { WALK_TYPES } from '@/lib/utils'
-import { TrendingUp, Users, Calendar, Repeat, Award } from 'lucide-react'
+import { TrendingUp, Users, Calendar, Repeat, Award, Download } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import * as XLSX from 'xlsx'
 
 // Best-effort price extraction from the WALK_TYPES label "... — £X" or "(N dogs) — £X"
 function priceOf(walkType: string): number {
@@ -109,11 +111,57 @@ export default function AnalyticsPage() {
     { label: 'Top walker', value: topWalker?.name || '—', sub: topWalker ? `${topWalker.count} bookings` : 'No bookings yet', icon: Award, color: 'bg-amber-50 text-amber-700' },
   ]
 
+  function exportToExcel() {
+    const wb = XLSX.utils.book_new()
+
+    // Sheet 1 — KPI summary
+    const summary = [
+      { Metric: 'Total revenue (£)', Value: totalRevenue.toFixed(2) },
+      { Metric: 'Revenue last 30 days (£)', Value: last30Revenue.toFixed(2) },
+      { Metric: 'Bookings (all-time)', Value: bookings.length },
+      { Metric: 'Bookings last 30 days', Value: last30.length },
+      { Metric: 'Repeat-booking rate (%)', Value: repeatRate },
+      { Metric: 'Repeat clients', Value: `${repeatClients} / ${totalClients}` },
+      { Metric: 'Top walker', Value: topWalker?.name || '—' },
+      { Metric: 'Top walker bookings', Value: topWalker?.count || 0 },
+      { Metric: 'Report date', Value: new Date().toLocaleDateString('en-GB') },
+    ]
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), 'Summary')
+
+    // Sheet 2 — Revenue by service
+    const serviceRows = Array.from(byService.values())
+      .sort((a, b) => b.revenue - a.revenue)
+      .map(s => ({ 'Service': s.label, 'Bookings': s.count, 'Revenue (£)': s.revenue.toFixed(2) }))
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(serviceRows), 'By Service')
+
+    // Sheet 3 — Monthly trend
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(months.map(m => ({
+      Month: m.label, Bookings: m.count, 'Revenue (£)': m.revenue.toFixed(2),
+    }))), 'Monthly Trend')
+
+    // Sheet 4 — Walker performance
+    const walkerRows = Array.from(walkerCounts.values()).sort((a: any, b: any) => b.count - a.count)
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(walkerRows.map((w: any) => ({ Walker: w.name, Bookings: w.count }))), 'Walkers')
+
+    // Sheet 5 — Day-of-week distribution
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dows.map((d, i) => ({
+      Day: d, Bookings: dowCounts[i],
+    }))), 'Day of Week')
+
+    const fname = `Rockys-Analytics-${new Date().toISOString().slice(0, 10)}.xlsx`
+    XLSX.writeFile(wb, fname, { bookType: 'xlsx' })
+  }
+
   return (
     <div className="space-y-6" data-testid="analytics-page">
-      <div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">Analytics</h1>
-        <p className="text-[#5C5C5C] mt-1">Revenue, bookings, walker performance — at a glance</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">Analytics</h1>
+          <p className="text-[#5C5C5C] mt-1">Revenue, bookings, walker performance — at a glance</p>
+        </div>
+        <Button variant="outline" onClick={exportToExcel} data-testid="export-analytics-excel">
+          <Download className="h-4 w-4 mr-2" /> Export to Excel
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

@@ -136,8 +136,12 @@ export default function ClientPets() {
     if (editingId) {
       const photoUrl = await uploadPhoto(editingId)
       payload.photo_url = photoUrl
-      const { error } = await supabase.from('dogs').update(payload).eq('id', editingId)
+      const { data: updated, error } = await supabase.from('dogs').update(payload).eq('id', editingId).select('id')
       if (error) { toast.error('Failed to update: ' + error.message); return }
+      if (!updated || updated.length === 0) {
+        toast.error('Save blocked — please refresh and sign in again (your session may have expired).')
+        return
+      }
       toast.success('Pet updated')
     } else {
       const { data: newPet, error } = await supabase.from('dogs').insert(payload).select().single()

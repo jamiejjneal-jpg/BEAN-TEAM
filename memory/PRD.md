@@ -260,3 +260,11 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - **`autoExtendIfLow(booking)` helper** in `lib/availability.ts` — checks how many future pending/confirmed occurrences remain for the booking's recurring template; if fewer than 2 weeks' worth, auto-creates the next 4 weeks of bookings.
 - **Walker walk completion hook** — on `Walk Complete` / `Drop off` in `/walker/walks`, if the booking belongs to a recurring template the horizon is auto-refreshed and both the client and all admins get an "auto-extended" in-app notification. Silent no-op when the template is paused, cap-ended, or already healthy.
 - Zero admin/client taps required — pairs with the earlier bulk-approve banner so new auto-extended batches surface as a single "Approve all N" row.
+
+
+### Feb 2026 (Fork — Phase 1: bug-fix + admin tools + heatmap + services CMS)
+- **🐛 P0 DATA-LOSS FIX**: Admins editing client/walker/pet cards were silently failing because RLS only allowed the row owner to update. Added `admin_write_policies.sql` migration (admins now have full ALL access on `dogs`, `profiles`, `walker_profiles`). All admin + client save paths now use `.select()` to surface 0-row blocks instead of falsely reporting success.
+- **Admin creates recurring walks** — `/admin/recurring` now has a "New regular walk" button with a full dialog: pick client → pet → walker (optional) → days/time/dates. If a walker is assigned, the first 8 weeks are auto-confirmed; otherwise pending. Client + walker both get in-app notifications.
+- **Analytics Excel export** — `/admin/analytics` now has an "Export to Excel" button producing a 5-sheet `.xlsx` (Summary KPIs, By Service, Monthly Trend, Walkers, Day of Week).
+- **Services CMS** — new migration `20260430_site_services.sql` creates a `site_services` table seeded from the hard-coded WALK_TYPES. New admin page `/admin/services` lets admins add/edit/reorder/price services, toggle bookable/pricing visibility. `/client/book` and `/pricing` now pull from this table (fallback to static list if DB empty).
+- **Workload heatmap** — new `WorkloadHeatmap` component above the admin calendar showing walker × day booking counts as a green-intensity grid.

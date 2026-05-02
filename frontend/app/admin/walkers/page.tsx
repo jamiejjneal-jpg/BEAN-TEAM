@@ -99,11 +99,16 @@ export default function AdminWalkers() {
       }
       const profilePayload: any = { full_name: form.full_name, phone: form.phone, address: form.address }
       if (avatarUrl !== null) profilePayload.avatar_url = avatarUrl
-      await supabase.from('profiles').update(profilePayload).eq('id', editingId)
-      await supabase.from('walker_profiles').update({
+      const { data: p, error: pErr } = await supabase.from('profiles').update(profilePayload).eq('id', editingId).select('id')
+      const { data: wp, error: wpErr } = await supabase.from('walker_profiles').update({
         bio: form.bio, experience_years: parseInt(form.experience_years) || 0,
         hourly_rate: parseFloat(form.hourly_rate) || 15, max_dogs: parseInt(form.max_dogs) || 3, service_area: form.service_area,
-      }).eq('id', editingId)
+      }).eq('id', editingId).select('id')
+      if (pErr || wpErr) { toast.error('Save failed: ' + (pErr?.message || wpErr?.message)); return }
+      if ((p?.length ?? 0) === 0 || (wp?.length ?? 0) === 0) {
+        toast.error('Save blocked — run the admin-write-policies SQL migration (see chat).')
+        return
+      }
       toast.success('Walker updated')
     } else {
       if (!form.password || form.password.length < 6) { toast.error('Password must be at least 6 characters'); return }

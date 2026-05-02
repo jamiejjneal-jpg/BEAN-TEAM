@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PawPrint, Check, Clock, Home, Moon, House, Dog, ArrowRight, PawPrint as PawPrintIcon, Plus } from 'lucide-react'
 import { SiteImage } from '@/components/shared/SiteImage'
+import { ExtraServicesSection } from '@/components/shared/ExtraServicesSection'
 
 type Tier = { label: string; price: string; sub?: string }
 
@@ -168,6 +169,8 @@ export default function PricingPage() {
           <p className="text-xs text-[#8A6A2A]/80 mt-4">Applied on top of the base booking price.</p>
         </div>
       </section>
+
+      <ExtraServicesSection />
 
       {/* CTA */}
       <section className="py-16 lg:py-20 bg-[#1A4331]">

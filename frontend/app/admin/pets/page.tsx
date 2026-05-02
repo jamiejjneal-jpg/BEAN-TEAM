@@ -220,8 +220,12 @@ export default function AdminPets() {
       payload.photo_url = null
     }
 
-    const { error } = await supabase.from('dogs').update(payload).eq('id', editPet.id)
+    const { data: updated, error } = await supabase.from('dogs').update(payload).eq('id', editPet.id).select('id')
     if (error) { toast.error('Failed to update: ' + error.message); return }
+    if (!updated || updated.length === 0) {
+      toast.error('Save blocked — run the admin-write-policies SQL migration (see chat) or refresh your session.')
+      return
+    }
     logAudit({ action: 'pet_updated', target_type: 'pet', target_id: editPet.id, target_name: form.name })
     toast.success('Pet updated')
     setEditPet(null)

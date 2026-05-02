@@ -88,7 +88,7 @@ export default function ClientProfile() {
       if (uploaded) avatarUrl = uploaded
     }
 
-    const { error } = await supabase.from('profiles').update({
+    const { data: updated, error } = await supabase.from('profiles').update({
       full_name: form.full_name,
       phone: form.phone,
       address: form.address,
@@ -97,10 +97,14 @@ export default function ClientProfile() {
       emergency_contact: form.emergency_contact,
       emergency_phone: form.emergency_phone,
       avatar_url: avatarUrl,
-    }).eq('id', user!.id)
+    }).eq('id', user!.id).select('id')
 
     setSaving(false)
     if (error) { toast.error('Failed to save: ' + error.message); return }
+    if (!updated || updated.length === 0) {
+      toast.error('Save blocked — please refresh and sign in again.')
+      return
+    }
     await refreshProfile()
     setPhotoFile(null); setPhotoPreview(null)
     toast.success('Profile updated')
