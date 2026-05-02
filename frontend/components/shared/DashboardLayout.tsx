@@ -8,7 +8,7 @@ import NotificationBell from '@/components/shared/NotificationBell'
 import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard, Users, CalendarDays, Dog, MapPin, Star,
-  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp, Plane, Repeat, PackageOpen
+  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp, Plane, Repeat, PackageOpen, Receipt
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SiteFooter } from '@/components/shared/SiteFooter'
@@ -24,6 +24,7 @@ const navItems = {
     { href: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
     { href: '/admin/recurring', label: 'Regular Walks', icon: Repeat },
     { href: '/admin/services', label: 'Services', icon: PackageOpen },
+    { href: '/admin/invoices', label: 'Invoices', icon: Receipt },
     { href: '/admin/time-off', label: 'Time Off', icon: Plane },
     { href: '/admin/calendar', label: 'Weekly Calendar', icon: Printer },
     { href: '/admin/analytics', label: 'Analytics', icon: TrendingUp },
@@ -50,6 +51,7 @@ const navItems = {
     { href: '/client/book', label: 'Book Walk', icon: MapPin },
     { href: '/client/recurring', label: 'Regular Walks', icon: Repeat },
     { href: '/client/bookings', label: 'My Bookings', icon: ClipboardList },
+    { href: '/client/invoices', label: 'Invoices', icon: Receipt },
     { href: '/client/calendar', label: 'Calendar', icon: Printer },
     { href: '/client/gallery', label: 'Walk Gallery', icon: Camera },
     { href: '/client/walkers', label: 'Find Walkers', icon: Star },

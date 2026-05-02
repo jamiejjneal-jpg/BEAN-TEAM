@@ -278,3 +278,13 @@ Build a dog walking business management system with three roles (Admin, Walker, 
 - **22 text slots** in `lib/site-texts.ts` across Global / Landing / Pricing / Auth.
 - **Editable site logo** — new `site_logo` slot added to `SITE_IMAGE_SLOTS`.
 - **Landing rewired** — hero, **new "Meet Rocky" section**, bottom CTA now read from `site_texts`. Pricing hero + bottom CTA likewise.
+
+
+### Feb 2026 (Fork — Phase 4: Invoices + SiteText 5-min cache)
+- **SiteText live-update cache (5 min)** — `<SiteText>` now refreshes every 5 minutes in the background and broadcasts cache invalidations via a pub-sub so copy edits propagate to open tabs without hard reload. Admin saves invalidate instantly.
+- **Phase 4 — Invoices dashboard live** — `/admin/invoices` with KPIs (paid this month, issued this month, outstanding, overdue, drafts), status tabs, manual create, auto-fill-from-walks, **auto-generate monthly** (one invoice per client with completed walks for a chosen month).
+- **PDF generation** via `jsPDF` + `jspdf-autotable` (client-side, zero-backend). Brand name pulled from `site_texts.brand_name`.
+- **Email invoice** — uses existing `bulk-mail` edge function (now supports `attachments`). Marks invoice as sent + records audit.
+- **Client invoices view** at `/client/invoices` — RLS scoped to own invoices, self-serve PDF download.
+- **New SQL**: `20260430_invoices.sql` — `invoices`, `invoice_items` tables with admin-manage + client-read-own RLS, plus `next_invoice_no()` helper.
+- Sidebar updated — "Invoices" links in both admin and client nav.

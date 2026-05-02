@@ -57,9 +57,10 @@ Deno.serve(async (req) => {
   let body: any
   try { body = await req.json() } catch { return json({ error: "Invalid JSON" }, { status: 400 }) }
 
-  const { subject, html, recipients, audit_name, auto_template_key } = body as {
+  const { subject, html, recipients, audit_name, auto_template_key, attachments } = body as {
     subject?: string; html?: string; audit_name?: string; auto_template_key?: string
     recipients?: { email?: string; full_name?: string }[]
+    attachments?: { filename: string; content: string; contentType?: string }[]
   }
 
   // Access rules:
@@ -115,10 +116,18 @@ Deno.serve(async (req) => {
     const greeting = r.full_name ? `<p>Hi ${r.full_name.split(" ")[0]},</p>` : ""
     const wrapped = wrap(effSubject!, `${greeting}${effHtml!}`)
     try {
+      const payload: any = { from: SENDER_EMAIL, to: [r.email], subject: effSubject, html: wrapped }
+      if (attachments && attachments.length > 0) {
+        payload.attachments = attachments.map(a => ({
+          filename: a.filename,
+          content: a.content,  // base64
+          content_type: a.contentType || 'application/octet-stream',
+        }))
+      }
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from: SENDER_EMAIL, to: [r.email], subject: effSubject, html: wrapped }),
+        body: JSON.stringify(payload),
       })
       if (res.ok) sent++
       else { failed++; failures.push(`${r.email}: ${res.status}`) }
