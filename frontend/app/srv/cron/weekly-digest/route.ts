@@ -7,6 +7,8 @@ import {
   type ClientWeeklyWalk,
 } from '@/lib/email'
 
+export const dynamic = 'force-dynamic'
+
 // Protected cron endpoint. Computes last-7-days KPIs, emails admins the
 // overall report and each active client their personal walk summary.
 //
@@ -16,7 +18,6 @@ import {
 //
 // Recommended schedule: every Sunday 18:00 (local) via cron-job.org or Vercel Cron.
 
-export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 async function handle(request: Request) {

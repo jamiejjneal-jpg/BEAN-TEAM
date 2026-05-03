@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import * as XLSX from 'xlsx'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 async function requireAdmin() {
   const supabase = await createServerClient()

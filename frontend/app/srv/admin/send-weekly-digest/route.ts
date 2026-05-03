@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 
+export const dynamic = 'force-dynamic'
+
 // Admin-only trigger for the weekly digest. Proxies to /srv/cron/weekly-digest
 // using the CRON_SECRET so admins can send the report on demand from the UI.
 export async function POST(request: Request) {

@@ -3,6 +3,8 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendAdminWelcome } from '@/lib/email'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   // Verify the caller is an authenticated admin
   const supabase = await createServerClient()

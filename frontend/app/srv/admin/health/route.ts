@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+// Force this route to be evaluated only at request time. Prevents Next.js
+// from trying to call the Supabase admin client during static-page collection
+// at build time (which would crash if SUPABASE_SERVICE_ROLE_KEY is unset).
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 async function requireAdmin() {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()

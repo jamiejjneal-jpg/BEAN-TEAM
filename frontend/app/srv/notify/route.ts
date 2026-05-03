@@ -8,6 +8,8 @@ import {
   sendClientDropoff,
 } from '@/lib/email'
 
+export const dynamic = 'force-dynamic'
+
 // Single secure endpoint for sending event emails. The server re-fetches
 // booking details to prevent tampering and enforces role-based access on
 // each event type.
