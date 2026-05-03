@@ -23,3 +23,12 @@ credentials.json
 
 # Emergent-specific secrets / memory files that must never be pushed
 memory/test_credentials.md
+-e 
+# Environment and credential files
+.env
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
