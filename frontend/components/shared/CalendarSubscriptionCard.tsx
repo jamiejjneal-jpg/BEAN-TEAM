@@ -15,7 +15,9 @@ const ROLE_HELP: Record<string, string> = {
   client: "Subscribe so your booked walks show up on your phone calendar automatically — even when we change them.",
 }
 
-const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/$/, '')
+import { PUBLIC_SUPABASE_URL } from '@/lib/supabase/public-config'
+
+const SUPABASE_URL = PUBLIC_SUPABASE_URL.replace(/\/$/, '')
 
 export function CalendarSubscriptionCard() {
   const { user, profile } = useAuth()
