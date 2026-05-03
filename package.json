@@ -4,8 +4,7 @@
   "private": true,
   "description": "Rocky's Retreat and Rambles — Next.js app (frontend lives in /frontend).",
   "scripts": {
-    "postinstall": "cd frontend && yarn install --frozen-lockfile=false",
-    "build": "cd frontend && yarn build",
+    "build": "cd frontend && yarn install --network-timeout 600000 && yarn build",
     "dev": "cd frontend && yarn dev",
     "start": "cd frontend && yarn start"
   },
@@ -14,6 +13,5 @@
   },
   "engines": {
     "node": ">=20"
-  },
-  "packageManager": "yarn@1.22.22"
+  }
 }
