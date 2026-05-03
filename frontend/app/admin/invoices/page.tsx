@@ -144,6 +144,7 @@ export default function AdminInvoicesPage() {
     const { data: inv, error } = await supabase.from('invoices').insert({
       invoice_no: noData as any,
       client_id: manualForm.client_id,
+      status: 'draft',
       issue_date: new Date().toISOString().slice(0, 10),
       due_date:   dueDate.toISOString().slice(0, 10),
       period_start: manualForm.period_start, period_end: manualForm.period_end,
@@ -184,6 +185,7 @@ export default function AdminInvoicesPage() {
         const { data: inv, error } = await supabase.from('invoices').insert({
           invoice_no: noData as any,
           client_id: c.id,
+          status: 'draft',
           issue_date: issue, due_date: due.toISOString().slice(0, 10),
           period_start: monthStart, period_end: monthEnd,
           subtotal, tax_rate: 0, tax_amount: 0, total,
