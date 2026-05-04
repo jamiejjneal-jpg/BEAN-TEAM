@@ -11,6 +11,8 @@ build/
 out/
 **/out/
 .DS_Store
+/.next/
+/public/
 
 # Environment and credential files
 .env

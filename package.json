@@ -2,9 +2,9 @@
   "name": "rockys-retreat-and-rambles",
   "version": "0.1.0",
   "private": true,
-  "description": "Rocky's Retreat and Rambles — Next.js app (frontend lives in /frontend).",
+  "description": "Rocky's Retreat and Rambles — Next.js app (frontend lives in /frontend, copied to root at build time).",
   "scripts": {
-    "build": "cd frontend && yarn install --network-timeout 600000 && yarn build",
+    "build": "cd frontend && yarn install --network-timeout 600000 && yarn build && cd .. && rm -rf .next public && cp -r frontend/.next .next && cp -r frontend/public public",
     "dev": "cd frontend && yarn dev",
     "start": "cd frontend && yarn start"
   },
