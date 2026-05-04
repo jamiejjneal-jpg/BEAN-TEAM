@@ -1,4 +1,3 @@
 {
-  "buildCommand": "yarn build",
   "framework": "nextjs"
 }
