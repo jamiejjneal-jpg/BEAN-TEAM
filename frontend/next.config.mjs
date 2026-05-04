@@ -15,9 +15,16 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.supabase.co' },
     ],
   },
+  // CRITICAL for Vercel: force single-threaded page data collection.
+  // Next.js 16's multi-worker page collector silently crashes on Vercel's
+  // 2-core runners, exiting with "Command failed with exit code 1" right
+  // after "Skipping validation of types" with zero error output.
+  experimental: {
+    cpus: 1,
+    workerThreads: false,
+  },
   // Hard-wire the @/* alias into webpack so the build does not depend on
-  // tsconfig path resolution (which has historically been flaky on Vercel
-  // CI when the tsconfig is not at the repo root).
+  // tsconfig path resolution.
   webpack: (config) => {
     config.resolve = config.resolve || {}
     config.resolve.alias = {

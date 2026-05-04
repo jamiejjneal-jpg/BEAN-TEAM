@@ -4,7 +4,7 @@
   "private": true,
   "description": "Rocky's Retreat and Rambles — Next.js app (frontend lives in /frontend, copied to root at build time).",
   "scripts": {
-    "build": "cd frontend && yarn install --network-timeout 600000 && yarn build && cd .. && rm -rf .next public && cp -r frontend/.next .next && cp -r frontend/public public",
+    "build": "set -e && cd frontend && yarn install --network-timeout 600000 && yarn build && cd .. && rm -rf .next public && cp -r frontend/.next .next && cp -r frontend/public public && echo 'Build copied to root successfully'",
     "dev": "cd frontend && yarn dev",
     "start": "cd frontend && yarn start"
   },
