@@ -8,7 +8,7 @@ import NotificationBell from '@/components/shared/NotificationBell'
 import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard, Users, CalendarDays, Dog, MapPin, Star,
-  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp, Plane, Repeat, PackageOpen, Receipt
+  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp, Plane, Repeat, PackageOpen, Receipt, KeyRound
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SiteFooter } from '@/components/shared/SiteFooter'
@@ -25,6 +25,7 @@ const navItems = {
     { href: '/admin/recurring', label: 'Regular Walks', icon: Repeat },
     { href: '/admin/services', label: 'Services', icon: PackageOpen },
     { href: '/admin/invoices', label: 'Invoices', icon: Receipt },
+    { href: '/admin/keys', label: 'Keys', icon: KeyRound },
     { href: '/admin/time-off', label: 'Time Off', icon: Plane },
     { href: '/admin/calendar', label: 'Weekly Calendar', icon: Printer },
     { href: '/admin/analytics', label: 'Analytics', icon: TrendingUp },
@@ -39,6 +40,7 @@ const navItems = {
   walker: [
     { href: '/walker', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/walker/walks', label: 'My Walks', icon: MapPin },
+    { href: '/walker/keys', label: 'Keys', icon: KeyRound },
     { href: '/walker/calendar', label: 'Calendar', icon: Printer },
     { href: '/walker/schedule', label: 'Schedule', icon: CalendarDays },
     { href: '/walker/unavailability', label: 'Time Off', icon: Plane },

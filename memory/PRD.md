@@ -4,10 +4,30 @@
 Build a dog walking business management system with three roles (Admin, Walker, Client) using Next.js + Supabase. Features: authentication, role-based dashboards, dog profiles with rich health/vet/behaviour info, walk booking with admin approval workflow, walker scheduling, walk photo gallery with slideshow, pickup/dropoff notifications, and a public pricing page. Payment integration deferred.
 
 ## Architecture
-- **Frontend**: Next.js 16 (App Router) + Tailwind CSS v4 + shadcn/ui
-- **Backend**: Supabase (Auth + PostgreSQL + Realtime + Storage)
-- **Admin API**: Next.js route handler `/api/admin/create-admin` using Supabase service role
-- **CSS Fallback**: Static `/public/styles.css` loaded in `layout.tsx` (production deployment strips devDependencies, so we ship pre-compiled CSS)
+- **Frontend**: Next.js 16 (App Router) + Tailwind CSS v4 + shadcn/ui — deployed on **Vercel** (repo root `package.json` declares Next.js so the platform auto-detects it; builds via `yarn build` which nests into `/frontend`).
+- **Backend**: Supabase (Auth + PostgreSQL + Realtime + Storage + Edge Functions)
+- **Public Supabase keys hardcoded** as runtime fallbacks in `lib/supabase/public-config.ts` so deploys don't require dashboard env-var setup. Only `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `CRON_SECRET` still require env vars (for `/srv/*` server routes).
+- **Admin API**: Next.js route handlers under `/srv/*` (all marked `force-dynamic`) using Supabase service role
+- **CSS Fallback**: Static `/public/styles.css` loaded in `layout.tsx`
+
+## Feb 2026 — QR Key System + invoice fixes (Feb 14)
+Added:
+- **QR key tagging + audit system** (`keys`, `key_events` tables + `record_key_event` / `lookup_key_by_token` RPCs)
+  - Admin: `/admin/keys` register with filters, search, CSV export, full-audit CSV export, printable view. `/admin/keys/[id]` per-key detail with audit trail, re-label, mark lost/retired/reactivated.
+  - Walker: `/walker/keys` — held keys list + camera QR scanner (html5-qrcode)
+  - Client: `/client/keys` — "My Keys" with live holder + activity log
+  - Public: `/k/[token]` handles all 4 audience types: admin/walker (full + action buttons with optional GPS), client (view-only history), unauthenticated (safe "Please return to Rocky's Retreat" card with contact info via `lookup_key_by_token` SECURITY DEFINER RPC)
+  - Email sent to client automatically when a new QR is created
+- **Invoice fixes**:
+  - `20260501_fix_invoices_rls_and_sequence.sql` — invoices now use `public.is_admin()` helper (fixes silent SELECT blocking caused by legacy recursive RLS policy). Switched numbering from `COUNT(*)+1` to a dedicated Postgres sequence (`invoice_no_seq`) to avoid duplicates after deletions and race conditions.
+  - Both invoice INSERT paths explicitly set `status: 'draft'` as defensive fallback.
+
+## Feb 2026 — Vercel deployment fixes
+- Root `/app/package.json` now declares `"next": "^16.2.4"` so Vercel/Cloudflare auto-detect as Next.js. `yarn build` at root proxies to `/frontend`.
+- `next build --webpack` instead of Turbopack (turbopack production builds silently failed page collection on Vercel CI).
+- All `/srv/*` routes explicitly `export const dynamic = 'force-dynamic'` so they aren't statically collected.
+- `next.config.mjs` hard-wires `@` alias via webpack config (tsconfig paths proved flaky on Vercel).
+- `public-config.ts` exports `PUBLIC_SUPABASE_URL` + `PUBLIC_SUPABASE_ANON_KEY` as fallbacks — app deploys with zero env-var configuration.
 
 ## User Personas
 1. **Admin** — Manages the platform: walkers, clients, dogs, bookings (approve/reject with reasons), and can create other admins.
