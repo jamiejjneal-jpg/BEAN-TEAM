@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import { Outfit, Manrope } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { AuthProvider } from '@/components/auth/AuthProvider'
+import PwaRegister from '@/components/pwa/PwaRegister'
+import OnlineStatus from '@/components/pwa/OnlineStatus'
+import InstallPrompt from '@/components/pwa/InstallPrompt'
 import './globals.css'
 
 const outfit = Outfit({
@@ -74,8 +77,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen antialiased">
+        <OnlineStatus />
         <AuthProvider>
           {children}
+          <PwaRegister />
+          <InstallPrompt />
           <Toaster
             position="top-right"
             toastOptions={{

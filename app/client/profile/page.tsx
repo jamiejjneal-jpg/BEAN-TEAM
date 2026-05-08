@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { Save, Camera, Loader2, X, Key, Phone, User, AlertCircle } from 'lucide-react'
 import { ChangePasswordCard } from '@/components/shared/ChangePasswordCard'
 import { CalendarSubscriptionCard } from '@/components/shared/CalendarSubscriptionCard'
+import PushSettingsCard from '@/components/pwa/PushSettingsCard'
 
 export default function ClientProfile() {
   const { user, profile, refreshProfile } = useAuth()
@@ -213,6 +214,8 @@ export default function ClientProfile() {
       </Button>
 
       <CalendarSubscriptionCard />
+
+      <PushSettingsCard />
 
       <ChangePasswordCard />
     </div>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Offline — Rocky's Retreat and Rambles</title>
+  <style>
+    :root {
+      --bg: #F9F8F6;
+      --card: #ffffff;
+      --ink: #1A1A1A;
+      --muted: #5C5C5C;
+      --accent: #1A4331;
+      --border: #E5E3DB;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: linear-gradient(135deg, var(--bg), #E8F0EC); color: var(--ink); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.25rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; max-width: 28rem; width: 100%; padding: 2rem; text-align: center; box-shadow: 0 20px 40px -20px rgba(26,67,49,.15); }
+    .icon { width: 3.5rem; height: 3.5rem; border-radius: 1rem; background: #E8F0EC; color: var(--accent); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    h1 { margin: 0 0 .5rem; font-size: 1.5rem; color: var(--accent); }
+    p { color: var(--muted); line-height: 1.5; margin: 0 0 1rem; font-size: .95rem; }
+    .btn { display: inline-block; padding: .75rem 1.25rem; background: var(--accent); color: #fff; border: none; border-radius: .5rem; font-weight: 500; cursor: pointer; font-size: .95rem; text-decoration: none; }
+    .btn:hover { background: #265C45; }
+    .hint { font-size: .8rem; color: var(--muted); margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+    </div>
+    <h1>You're offline</h1>
+    <p>No internet connection right now. Don't worry — anything you've already viewed is still available. Any actions you take (pickups, photos, key scans) will automatically sync as soon as you're back online.</p>
+    <button class="btn" onclick="location.reload()">Retry connection</button>
+    <p class="hint">Tip: The walker dashboard, today's schedule and dog profiles stay available offline.</p>
+  </div>
+</body>
+</html>

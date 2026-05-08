@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { Save, Star, Camera, Loader2, X } from 'lucide-react'
 import { ChangePasswordCard } from '@/components/shared/ChangePasswordCard'
 import { CalendarSubscriptionCard } from '@/components/shared/CalendarSubscriptionCard'
+import PushSettingsCard from '@/components/pwa/PushSettingsCard'
 
 export default function WalkerProfile() {
   const { user, profile, refreshProfile } = useAuth()
@@ -217,6 +218,8 @@ export default function WalkerProfile() {
       </Button>
 
       <CalendarSubscriptionCard />
+
+      <PushSettingsCard />
 
       <ChangePasswordCard />
     </div>

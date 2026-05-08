@@ -11,6 +11,7 @@ import { formatDate, formatTime, BOOKING_STATUSES } from '@/lib/utils'
 import { toast } from 'sonner'
 import { notify } from '@/lib/notify'
 import { autoExtendIfLow } from '@/lib/availability'
+import { enqueue } from '@/lib/pwa/offline-queue'
 import { MapPin, CheckCircle, Navigation, Home, Camera, Image as ImageIcon, Loader2, X } from 'lucide-react'
 
 export default function WalkerWalks() {
@@ -53,6 +54,22 @@ export default function WalkerWalks() {
       event_type: eventType,
       notes: eventType === 'note' ? noteText : '',
     })
+
+    // Offline fallback — queue a booking status update; walk_log insert
+    // will be replayed by the user next time they're online.
+    if (error && (!navigator.onLine || /network|fetch|failed/i.test(error.message || ''))) {
+      const newStatus =
+        eventType === 'arrived' || eventType === 'picked_up' ? 'in_progress'
+        : eventType === 'dropped_off' || eventType === 'completed' ? 'completed'
+        : null
+      if (newStatus) {
+        await enqueue({ kind: 'booking_status', booking_id: bookingId, status: newStatus, when: new Date().toISOString() })
+      }
+      toast.success(`${eventType.replace('_', ' ')} saved — will sync when online`)
+      setNoteText('')
+      setSelectedWalk(null)
+      return
+    }
     if (error) { toast.error('Failed to log event'); return }
 
     if (eventType === 'arrived' || eventType === 'picked_up') {
@@ -98,6 +115,30 @@ export default function WalkerWalks() {
     }
 
     setUploadingPhoto(bookingId)
+
+    // Offline path: read as data URL, queue, return cleanly.
+    if (!navigator.onLine) {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader()
+        r.onload = () => resolve(String(r.result))
+        r.onerror = () => reject(r.error)
+        r.readAsDataURL(file)
+      })
+      const walk = walks.find(w => w.id === bookingId)
+      await enqueue({
+        kind: 'walk_log_photo',
+        booking_id: bookingId,
+        dog_id: walk?.dog_id || null,
+        walker_id: user?.id || null,
+        photo_data_url: dataUrl,
+        caption: 'Walk photo',
+        when: new Date().toISOString(),
+      })
+      toast.success('Photo saved — will upload when online')
+      setUploadingPhoto(null)
+      return
+    }
+
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const filePath = `walks/${bookingId}/${Date.now()}.${ext}`
 

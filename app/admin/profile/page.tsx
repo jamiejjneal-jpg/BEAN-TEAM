@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { Save, Camera, Loader2, X } from 'lucide-react'
 import { ChangePasswordCard } from '@/components/shared/ChangePasswordCard'
 import { CalendarSubscriptionCard } from '@/components/shared/CalendarSubscriptionCard'
+import PushSettingsCard from '@/components/pwa/PushSettingsCard'
 
 function initialsFrom(name?: string | null, email?: string | null) {
   const src = (name || email || '').trim()
@@ -154,6 +155,8 @@ export default function AdminProfile() {
       </Button>
 
       <CalendarSubscriptionCard />
+
+      <PushSettingsCard />
 
       <ChangePasswordCard />
     </div>

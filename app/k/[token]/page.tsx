@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { KeyRound, MapPin, Loader2, ArrowRight, Home } from 'lucide-react'
 import { toast } from 'sonner'
 import { type Key, type KeyEvent, fmtDateTime, statusTone } from '@/lib/keys'
+import { enqueue } from '@/lib/pwa/offline-queue'
 
 type Mode = 'loading' | 'public' | 'client_view' | 'authed_full'
 
@@ -100,6 +101,20 @@ export default function KeyScanPage({ params }: { params: Promise<{ token: strin
       p_user_agent: navigator.userAgent.slice(0, 200),
     })
     setBusy(false)
+
+    // Offline fallback: queue it and fake success locally.
+    if (error && (!navigator.onLine || /network|fetch|failed/i.test(error.message || ''))) {
+      await enqueue({
+        kind: 'key_event',
+        key_id: key.id,
+        event_type: ev,
+        geo_lat: lat, geo_lng: lng,
+        user_agent: navigator.userAgent.slice(0, 200),
+        when: new Date().toISOString(),
+      })
+      toast.success(ev === 'pickup' ? 'Pickup queued — will sync when online' : 'Dropoff queued — will sync when online')
+      return
+    }
     if (error) { toast.error(error.message); return }
     toast.success(ev === 'pickup' ? 'Key picked up — logged' : 'Key returned — logged')
     init()
