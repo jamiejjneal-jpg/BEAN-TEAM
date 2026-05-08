@@ -15,5 +15,10 @@ app.add_middleware(
 )
 
 @app.get("/api/health")
-async def health():
+async def api_health():
     return {"status": "ok", "service": "PawTrail Backend"}
+
+# Bare /health for Kubernetes / Emergent deployment health probes
+@app.get("/health")
+async def root_health():
+    return {"status": "ok"}
