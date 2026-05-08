@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
-import { Mail, Phone, Dog, Plus, Pencil, Trash2, Key, AlertTriangle, Camera, X, Loader2, UserCog, Search } from 'lucide-react'
+import { Mail, Phone, Dog, Plus, Pencil, Trash2, Key, AlertTriangle, Camera, X, Loader2, UserCog, Search, Upload } from 'lucide-react'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { changeUserRole, deleteUser, type Role } from '@/lib/admin-ops'
@@ -230,6 +231,9 @@ export default function AdminClients() {
             <Input placeholder="Search name, email or phone..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" data-testid="client-search" />
           </div>
           <Button onClick={openNew} data-testid="add-client-button"><Plus className="h-4 w-4 mr-1" /> Add Client</Button>
+          <Link href="/admin/clients/import">
+            <Button variant="outline" data-testid="import-clients-button"><Upload className="h-4 w-4 mr-1" /> Import</Button>
+          </Link>
         </div>
       </div>
 
