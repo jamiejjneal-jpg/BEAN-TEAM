@@ -5,6 +5,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider'
 import PwaRegister from '@/components/pwa/PwaRegister'
 import OnlineStatus from '@/components/pwa/OnlineStatus'
 import InstallPrompt from '@/components/pwa/InstallPrompt'
+import RefreshButton from '@/components/pwa/RefreshButton'
 import './globals.css'
 
 const outfit = Outfit({
@@ -82,6 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <PwaRegister />
           <InstallPrompt />
+          <RefreshButton />
           <Toaster
             position="top-right"
             toastOptions={{
