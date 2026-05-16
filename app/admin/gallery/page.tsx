@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
+import { ShareToSocialsButton } from '@/components/social/ShareToSocialsButton'
 import { formatDate } from '@/lib/utils'
 import { Image as ImageIcon, Trash2, Dog, User, Calendar, Plus, Send, MessageSquare, Upload, Loader2, X, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
@@ -232,6 +233,24 @@ export default function AdminGallery() {
               <img src={p.photo_url} alt="Walk photo" className="w-full h-full object-cover cursor-pointer" onClick={() => { setLightbox(p); setCaptionDraft(p.caption || '') }} />
               {/* Always-visible action buttons (top-right) */}
               <div className="absolute top-1.5 right-1.5 flex gap-1.5">
+                <div className="h-8 w-8 rounded-full bg-white/95 shadow-md flex items-center justify-center hover:bg-white hover:scale-110 transition-all" onClick={e => e.stopPropagation()}>
+                  <ShareToSocialsButton
+                    iconOnly
+                    photoUrl={p.photo_url}
+                    bookingId={p.booking_id}
+                    dogId={p.booking?.dog?.id}
+                    ctx={{
+                      dog_name: p.booking?.dog?.name,
+                      client_name: p.booking?.client?.full_name,
+                      walker_name: p.booking?.walker?.full_name,
+                      service: p.booking?.walk_type,
+                      caption: p.caption || '',
+                      ig_dog: p.booking?.dog?.social_instagram,
+                      ig_client: p.booking?.client?.social_instagram,
+                      fb_client: p.booking?.client?.social_facebook,
+                    }}
+                  />
+                </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); setLightbox(p); setCaptionDraft(p.caption || ''); setEditingCaption(true) }}
                   className="h-8 w-8 rounded-full bg-white/95 text-[#1A4331] shadow-md flex items-center justify-center hover:bg-white hover:scale-110 transition-all"

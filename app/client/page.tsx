@@ -13,6 +13,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { formatDate, formatTime, BOOKING_STATUSES } from '@/lib/utils'
 import { toast } from 'sonner'
 import { NpsPrompt } from '@/components/shared/NpsPrompt'
+import BirthdayBanner from '@/components/shared/BirthdayBanner'
 
 function initialsFrom(name?: string | null, email?: string | null) {
   const src = (name || email || '').trim()
@@ -90,6 +91,7 @@ export default function ClientDashboard() {
 
   return (
     <div className="space-y-8" data-testid="client-dashboard">
+      <BirthdayBanner ownerId={user?.id} />
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14 sm:h-16 sm:w-16 border-2 border-[#E5E3DB] shadow-sm" data-testid="client-avatar">

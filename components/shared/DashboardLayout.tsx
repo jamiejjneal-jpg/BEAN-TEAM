@@ -8,7 +8,7 @@ import NotificationBell from '@/components/shared/NotificationBell'
 import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard, Users, CalendarDays, Dog, MapPin, Star,
-  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp, Plane, Repeat, PackageOpen, Receipt, KeyRound, Wallet
+  ClipboardList, Settings, LogOut, Menu, X, PawPrint, Camera, Shield, DollarSign, Activity, Image as ImageIcon, History, Printer, Mail, Bell, TrendingUp, Plane, Repeat, PackageOpen, Receipt, KeyRound, Wallet, Share2, Tag
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SiteFooter } from '@/components/shared/SiteFooter'
@@ -26,6 +26,7 @@ const navItems = {
     { href: '/admin/services', label: 'Services', icon: PackageOpen },
     { href: '/admin/invoices', label: 'Invoices', icon: Receipt },
     { href: '/admin/payouts', label: 'Payouts', icon: Wallet },
+    { href: '/admin/promos', label: 'Promos', icon: Tag },
     { href: '/admin/keys', label: 'Keys', icon: KeyRound },
     { href: '/admin/time-off', label: 'Time Off', icon: Plane },
     { href: '/admin/calendar', label: 'Weekly Calendar', icon: Printer },
@@ -34,6 +35,7 @@ const navItems = {
     { href: '/admin/gallery', label: 'Gallery', icon: Camera },
     { href: '/admin/team', label: 'Team', icon: Shield },
     { href: '/admin/site-setup', label: 'Site Setup', icon: ImageIcon },
+    { href: '/admin/social', label: 'Social', icon: Share2 },
     { href: '/admin/audit', label: 'Audit Log', icon: History },
     { href: '/admin/health', label: 'Health', icon: Activity },
     { href: '/settings/notifications', label: 'Notifications', icon: Bell },

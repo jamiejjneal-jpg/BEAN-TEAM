@@ -15,6 +15,7 @@ import { exportClients, exportPets, exportBookings } from '@/lib/exports'
 import { logAudit } from '@/lib/audit'
 import { LastLoginCard } from '@/components/shared/LastLoginCard'
 import { SpeciesBreakdownWidget } from '@/components/shared/SpeciesBreakdownWidget'
+import BirthdayBanner from '@/components/shared/BirthdayBanner'
 
 function initialsFrom(name?: string | null, email?: string | null) {
   const src = (name || email || '').trim()
@@ -102,6 +103,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8" data-testid="admin-dashboard">
+      <BirthdayBanner />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14 sm:h-16 sm:w-16 border-2 border-[#E5E3DB] shadow-sm" data-testid="admin-avatar">

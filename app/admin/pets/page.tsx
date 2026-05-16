@@ -29,7 +29,7 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
 
 const emptyPet = {
   species: 'dog' as PetSpecies,
-  name: '', breed: '', age: '', weight: '', size: 'medium', special_notes: '', medical_info: '',
+  name: '', breed: '', age: '', date_of_birth: '', weight: '', size: 'medium', special_notes: '', medical_info: '',
   off_lead: false, vet_name: '', vet_phone: '', vet_address: '', vaccinations_up_to_date: false,
   vaccination_details: '', food_type: '', food_schedule: '', allergies: '',
   neutered: false, microchipped: false, microchip_number: '', emergency_contact: '', emergency_phone: '',
@@ -141,6 +141,7 @@ export default function AdminPets() {
       species: newForm.species,
       name: newForm.name, breed: newForm.breed,
       age: newForm.age ? parseInt(newForm.age) : null,
+      date_of_birth: newForm.date_of_birth || null,
       weight: newForm.weight ? parseFloat(newForm.weight) : null,
       size: newForm.size, special_notes: newForm.special_notes,
       details: newForm.details || {},
@@ -157,7 +158,7 @@ export default function AdminPets() {
   function openEdit(p: any) {
     setForm({
       species: (p.species || 'dog') as PetSpecies,
-      name: p.name || '', breed: p.breed || '', age: p.age?.toString() || '', weight: p.weight?.toString() || '',
+      name: p.name || '', breed: p.breed || '', age: p.age?.toString() || '', date_of_birth: p.date_of_birth || '', weight: p.weight?.toString() || '',
       size: p.size || 'medium', special_notes: p.special_notes || '', medical_info: p.medical_info || '',
       off_lead: p.off_lead || false, vet_name: p.vet_name || '', vet_phone: p.vet_phone || '',
       vet_address: p.vet_address || '', vaccinations_up_to_date: p.vaccinations_up_to_date || false,
@@ -201,7 +202,7 @@ export default function AdminPets() {
     if (!form.name.trim()) { toast.error('Please enter a name'); setTab('basic'); return }
     const payload: any = {
       species: form.species,
-      name: form.name, breed: form.breed, age: form.age ? parseInt(form.age) : null,
+      name: form.name, breed: form.breed, age: form.age ? parseInt(form.age) : null, date_of_birth: form.date_of_birth || null,
       weight: form.weight ? parseFloat(form.weight) : null, size: form.size,
       special_notes: form.special_notes, medical_info: form.medical_info,
       off_lead: form.off_lead, vet_name: form.vet_name, vet_phone: form.vet_phone, vet_address: form.vet_address,
@@ -389,6 +390,7 @@ export default function AdminPets() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2"><Label>Age (yrs)</Label><Input type="number" min={0} value={form.age} onChange={e => setForm({ ...form, age: e.target.value })} /></div>
+                <div className="space-y-2"><Label>Date of birth (for birthdays!)</Label><Input type="date" value={form.date_of_birth} onChange={e => setForm({ ...form, date_of_birth: e.target.value })} data-testid="pet-dob" /></div>
                 {form.species !== 'fish' && <div className="space-y-2"><Label>Weight (kg)</Label><Input type="number" min={0} step={0.1} value={form.weight} onChange={e => setForm({ ...form, weight: e.target.value })} /></div>}
                 {isDog && <div className="space-y-2"><Label>Size</Label><Select value={form.size} onValueChange={v => setForm({ ...form, size: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{DOG_SIZES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent></Select></div>}
               </div>
@@ -477,6 +479,7 @@ export default function AdminPets() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-2"><Label>Age (yrs)</Label><Input type="number" min={0} value={newForm.age} onChange={e => setNewForm({ ...newForm, age: e.target.value })} /></div>
+              <div className="space-y-2"><Label>Date of birth</Label><Input type="date" value={newForm.date_of_birth} onChange={e => setNewForm({ ...newForm, date_of_birth: e.target.value })} /></div>
               {newForm.species !== 'fish' && <div className="space-y-2"><Label>Weight (kg)</Label><Input type="number" min={0} step={0.1} value={newForm.weight} onChange={e => setNewForm({ ...newForm, weight: e.target.value })} /></div>}
               {newForm.species === 'dog' && <div className="space-y-2"><Label>Size</Label><Select value={newForm.size} onValueChange={v => setNewForm({ ...newForm, size: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{DOG_SIZES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent></Select></div>}
             </div>

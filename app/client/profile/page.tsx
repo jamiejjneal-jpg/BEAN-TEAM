@@ -20,6 +20,7 @@ export default function ClientProfile() {
     full_name: '', phone: '', address: '',
     key_code: '', key_location: '',
     emergency_contact: '', emergency_phone: '',
+    social_instagram: '', social_facebook: '',
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -41,6 +42,8 @@ export default function ClientProfile() {
       key_location: data?.key_location || '',
       emergency_contact: data?.emergency_contact || '',
       emergency_phone: data?.emergency_phone || '',
+      social_instagram: data?.social_instagram || '',
+      social_facebook: data?.social_facebook || '',
     })
     setLoading(false)
   }
@@ -97,6 +100,8 @@ export default function ClientProfile() {
       key_location: form.key_location,
       emergency_contact: form.emergency_contact,
       emergency_phone: form.emergency_phone,
+      social_instagram: form.social_instagram.trim().replace(/^@/, '') || null,
+      social_facebook: form.social_facebook.trim().replace(/^@/, '') || null,
       avatar_url: avatarUrl,
     }).eq('id', user!.id).select('id')
 
@@ -206,6 +211,17 @@ export default function ClientProfile() {
         <CardContent className="space-y-4">
           <div className="space-y-2"><Label>Contact Name{req}</Label><Input value={form.emergency_contact} onChange={(e) => setForm({ ...form, emergency_contact: e.target.value })} data-testid="emergency-contact-name" required /></div>
           <div className="space-y-2"><Label>Contact Phone{req}</Label><Input value={form.emergency_phone} onChange={(e) => setForm({ ...form, emergency_phone: e.target.value })} data-testid="emergency-contact-phone" placeholder="+44 7xxx xxx xxx" required /></div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Socials (optional)</CardTitle>
+          <CardDescription>If we share a walk photo featuring you, we&apos;ll tag your handles so you get notified.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2"><Label>Instagram handle</Label><Input value={form.social_instagram} onChange={(e) => setForm({ ...form, social_instagram: e.target.value })} placeholder="@yourhandle" data-testid="social-ig" /></div>
+          <div className="space-y-2"><Label>Facebook page / username</Label><Input value={form.social_facebook} onChange={(e) => setForm({ ...form, social_facebook: e.target.value })} placeholder="@yourpage" data-testid="social-fb" /></div>
         </CardContent>
       </Card>
 

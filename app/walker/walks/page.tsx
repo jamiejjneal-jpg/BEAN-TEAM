@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { notify } from '@/lib/notify'
 import { autoExtendIfLow } from '@/lib/availability'
 import { enqueue } from '@/lib/pwa/offline-queue'
+import { ShareToSocialsButton } from '@/components/social/ShareToSocialsButton'
 import { MapPin, CheckCircle, Navigation, Home, Camera, Image as ImageIcon, Loader2, X } from 'lucide-react'
 
 export default function WalkerWalks() {
@@ -31,7 +32,7 @@ export default function WalkerWalks() {
   async function fetchWalks() {
     const { data } = await supabase
       .from('bookings')
-      .select('*, client:profiles!bookings_client_id_fkey(full_name, phone, email), dog:dogs(name, breed, size, special_notes, photo_url), walk_logs(*)')
+      .select('*, client:profiles!bookings_client_id_fkey(full_name, phone, email, social_instagram, social_facebook), dog:dogs(id, name, breed, size, special_notes, photo_url, social_instagram, social_facebook), walk_logs(*)')
       .eq('walker_id', user!.id)
       .in('status', ['confirmed', 'in_progress'])
       .order('scheduled_date', { ascending: true })
@@ -268,6 +269,24 @@ export default function WalkerWalks() {
                               <div key={p.id} className="relative shrink-0 h-20 w-20 rounded-lg overflow-hidden border border-[#E5E3DB] group">
                                 <img src={p.photo_url} alt="Walk photo" className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                                <div className="absolute top-1 right-1 bg-white/95 rounded shadow-sm">
+                                  <ShareToSocialsButton
+                                    iconOnly
+                                    photoUrl={p.photo_url}
+                                    bookingId={walk.id}
+                                    dogId={walk.dog?.id}
+                                    ctx={{
+                                      dog_name: walk.dog?.name,
+                                      client_name: walk.client?.full_name,
+                                      walker_name: user?.email?.split('@')[0],
+                                      service: walk.walk_type,
+                                      caption: p.caption || '',
+                                      ig_dog: walk.dog?.social_instagram,
+                                      ig_client: walk.client?.social_instagram,
+                                      fb_client: walk.client?.social_facebook,
+                                    }}
+                                  />
+                                </div>
                               </div>
                             ))}
                           </div>
