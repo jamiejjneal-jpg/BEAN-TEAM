@@ -74,7 +74,7 @@ export default function AdminRecurringPage() {
         .order('is_active', { ascending: false })
         .order('created_at', { ascending: false }),
       supabase.from('profiles').select('id, full_name, email, address').eq('role', 'client').eq('is_active', true).order('full_name'),
-      supabase.from('profiles').select('id, full_name').eq('role', 'walker').eq('is_active', true).order('full_name'),
+      supabase.from('profiles').select('id, full_name, role').in('role', ['walker', 'admin']).eq('is_active', true).order('full_name'),
       supabase.from('dogs').select('id, name, breed, owner_id, species').eq('is_active', true),
     ])
     setRows((tplRes.data as Row[] | null) || [])

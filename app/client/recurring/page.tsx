@@ -82,7 +82,7 @@ export default function ClientRecurringPage() {
     const [tplRes, dogsRes, walkersRes, profRes] = await Promise.all([
       supabase.from('recurring_bookings').select('*').eq('client_id', user!.id).order('created_at', { ascending: false }),
       supabase.from('dogs').select('*').eq('owner_id', user!.id).eq('is_active', true),
-      supabase.from('profiles').select('id, full_name, walker_profiles(is_available)').eq('role', 'walker').eq('is_active', true),
+      supabase.from('profiles').select('id, full_name, role, walker_profiles(is_available)').in('role', ['walker', 'admin']).eq('is_active', true),
       supabase.from('profiles').select('address').eq('id', user!.id).maybeSingle(),
     ])
     const tpls = (tplRes.data as Template[] | null) || []

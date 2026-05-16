@@ -39,7 +39,7 @@ export function WorkloadHeatmap({ weekStart }: { weekStart?: Date }) {
       setLoading(true)
       const [walkersRes, bookingsRes] = await Promise.all([
         supabase.from('profiles').select('id, full_name')
-          .eq('role', 'walker').eq('is_active', true).order('full_name'),
+          .in('role', ['walker', 'admin']).eq('is_active', true).order('full_name'),
         supabase.from('bookings').select('walker_id, scheduled_date, status')
           .gte('scheduled_date', startIso).lte('scheduled_date', endIso)
           .in('status', ['pending', 'confirmed', 'in_progress', 'completed']),

@@ -66,7 +66,7 @@ export default function AdminBookings() {
   async function fetchData() {
     const [bookingsRes, walkersRes, clientsRes, dogsRes] = await Promise.all([
       supabase.from('bookings').select('*, client:profiles!bookings_client_id_fkey(full_name, email), walker:profiles!bookings_walker_id_fkey(full_name), dog:dogs(name, breed), recurring_template:recurring_bookings(id, walker_id, days_of_week, scheduled_time, walk_type)').order('scheduled_date', { ascending: false }),
-      supabase.from('profiles').select('id, full_name, walker_profiles(max_dogs)').eq('role', 'walker').eq('is_active', true),
+      supabase.from('profiles').select('id, full_name, role, walker_profiles(max_dogs)').in('role', ['walker', 'admin']).eq('is_active', true),
       supabase.from('profiles').select('id, full_name, email, address').eq('role', 'client').eq('is_active', true).order('full_name'),
       supabase.from('dogs').select('id, name, breed, owner_id').eq('is_active', true),
     ])

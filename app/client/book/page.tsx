@@ -55,7 +55,7 @@ export default function BookWalk() {
   async function fetchData() {
     const [petsRes, walkersRes, profileRes] = await Promise.all([
       supabase.from('dogs').select('*').eq('owner_id', user!.id).eq('is_active', true),
-      supabase.from('profiles').select('id, full_name, walker_profiles(rating, hourly_rate, total_reviews, is_available)').eq('role', 'walker').eq('is_active', true),
+      supabase.from('profiles').select('id, full_name, role, walker_profiles(rating, hourly_rate, total_reviews, is_available)').in('role', ['walker', 'admin']).eq('is_active', true),
       supabase.from('profiles').select('*').eq('id', user!.id).maybeSingle(),
     ])
     const pets = petsRes.data || []
